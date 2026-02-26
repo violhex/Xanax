@@ -1,0 +1,163 @@
+"""
+Tests for xanax search parameters.
+"""
+
+import pytest
+
+from xanax.enums import Category, Color, Order, Purity, Sort, TopRange
+from xanax.errors import ValidationError
+from xanax.search import SearchParams
+
+
+class TestSearchParams:
+    def test_defaults(self):
+        params = SearchParams()
+        assert params.query is None
+        assert params.categories == [Category.GENERAL]
+        assert params.purity == [Purity.SFW]
+        assert params.sorting == Sort.DATE_ADDED
+        assert params.order == Order.DESC
+        assert params.top_range is None
+        assert params.resolutions == []
+        assert params.ratios == []
+        assert params.colors == []
+        assert params.page == 1
+        assert params.seed is None
+
+    def test_basic_search(self):
+        params = SearchParams(query="anime")
+        assert params.query == "anime"
+
+    def test_with_purity(self):
+        params = SearchParams(purity=[Purity.SFW, Purity.SKETCHY])
+        assert params.purity == [Purity.SFW, Purity.SKETCHY]
+
+    def test_with_sorting(self):
+        params = SearchParams(sorting=Sort.RANDOM)
+        assert params.sorting == Sort.RANDOM
+
+    def test_with_toplist(self):
+        params = SearchParams(
+            sorting=Sort.TOPLIST,
+            top_range=TopRange.ONE_MONTH,
+        )
+        assert params.sorting == Sort.TOPLIST
+        assert params.top_range == TopRange.ONE_MONTH
+
+    def test_top_range_without_toplist_fails(self):
+        with pytest.raises(ValidationError) as exc_info:
+            SearchParams(
+                sorting=Sort.DATE_ADDED,
+                top_range=TopRange.ONE_MONTH,
+            )
+
+        assert "toplist" in str(exc_info.value).lower()
+
+    def test_invalid_resolution_raises(self):
+        with pytest.raises(ValidationError) as exc_info:
+            SearchParams(resolutions=["invalid"])
+
+        assert "resolution" in str(exc_info.value).lower()
+
+    def test_invalid_ratio_raises(self):
+        with pytest.raises(ValidationError) as exc_info:
+            SearchParams(ratios=["invalid"])
+
+        assert "ratio" in str(exc_info.value).lower()
+
+    def test_invalid_seed_raises(self):
+        with pytest.raises(ValidationError) as exc_info:
+            SearchParams(seed="abc")
+
+        assert "seed" in str(exc_info.value).lower()
+
+
+class TestSearchParamsToQueryParams:
+    def test_empty_params(self):
+        params = SearchParams()
+        query = params.to_query_params()
+        assert query["sorting"] == "date_added"
+        assert query["order"] == "desc"
+        assert query["categories"] == "100"
+        assert query["purity"] == "100"
+
+    def test_with_query(self):
+        params = SearchParams(query="anime")
+        query = params.to_query_params()
+        assert query["q"] == "anime"
+
+    def test_with_multiple_purity(self):
+        params = SearchParams(purity=[Purity.SFW, Purity.NSFW])
+        query = params.to_query_params()
+        assert query["purity"] == "101"
+
+    def test_with_multiple_categories(self):
+        params = SearchParams(categories=[Category.GENERAL, Category.ANIME])
+        query = params.to_query_params()
+        assert query["categories"] == "110"
+
+    def test_toplist_includes_toprange(self):
+        params = SearchParams(
+            sorting=Sort.TOPLIST,
+            top_range=TopRange.ONE_MONTH,
+        )
+        query = params.to_query_params()
+        assert query["topRange"] == "1M"
+
+    def test_page_not_included_when_1(self):
+        params = SearchParams(page=1)
+        query = params.to_query_params()
+        assert "page" not in query
+
+    def test_page_included_when_greater_than_1(self):
+        params = SearchParams(page=5)
+        query = params.to_query_params()
+        assert query["page"] == 5
+
+    def test_seed_included_when_provided(self):
+        params = SearchParams(seed="abc123")
+        query = params.to_query_params()
+        assert query["seed"] == "abc123"
+
+    def test_resolutions_joined(self):
+        params = SearchParams(resolutions=["1920x1080", "2560x1440"])
+        query = params.to_query_params()
+        assert query["resolutions"] == "1920x1080,2560x1440"
+
+    def test_ratios_joined(self):
+        params = SearchParams(ratios=["16x9", "4x3"])
+        query = params.to_query_params()
+        assert query["ratios"] == "16x9,4x3"
+
+    def test_colors_joined(self):
+        params = SearchParams(colors=[Color.BLUE, Color.RED])
+        query = params.to_query_params()
+        assert query["colors"] == "0066cc,cc0000"
+
+
+class TestSearchParamsWithPage:
+    def test_with_page(self):
+        params = SearchParams(query="anime")
+        new_params = params.with_page(5)
+        assert new_params.page == 5
+        assert new_params.query == "anime"
+
+    def test_preserves_other_params(self):
+        params = SearchParams(
+            query="test",
+            categories=[Category.ANIME],
+            sorting=Sort.RANDOM,
+        )
+        new_params = params.with_page(3)
+        assert new_params.query == "test"
+        assert new_params.categories == [Category.ANIME]
+        assert new_params.sorting == Sort.RANDOM
+        assert new_params.page == 3
+
+
+class TestSearchParamsWithSeed:
+    def test_with_seed(self):
+        params = SearchParams(sorting=Sort.RANDOM)
+        new_params = params.with_seed("xyz123")
+        assert new_params.seed == "xyz123"
+        assert new_params.sorting == Sort.RANDOM
