@@ -4,12 +4,12 @@ version = "0.1.0"
 description = "A clean, type-safe Python client for the Wallhaven.cc API v1"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "BSD" }
+license = { text = "BSD-3-Clause" }
 authors = [
     { name = "xanax" }
 ]
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
 ]
