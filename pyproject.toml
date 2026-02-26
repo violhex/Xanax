@@ -1,6 +1,6 @@
 [project]
 name = "xanax"
-version = "0.1.0"
+version = "0.1.1"
 description = "A clean, type-safe Python client for the Wallhaven.cc API v1"
 readme = "README.md"
 requires-python = ">=3.12"
