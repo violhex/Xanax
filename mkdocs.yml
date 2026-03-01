@@ -79,6 +79,7 @@ nav:
     - Collections: guide/collections.md
     - Error Handling: guide/error-handling.md
   - Sources:
+    - Wallhaven: sources/wallhaven.md
     - Unsplash: sources/unsplash.md
   - API Reference:
     - Clients: api/clients.md
