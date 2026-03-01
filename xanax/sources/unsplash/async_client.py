@@ -96,9 +96,7 @@ class AsyncUnsplash:
         )
 
         if response.status_code == 401:
-            raise AuthenticationError(
-                "Unsplash authentication failed. Check your access key."
-            )
+            raise AuthenticationError("Unsplash authentication failed. Check your access key.")
 
         if response.status_code == 404:
             raise NotFoundError(f"Resource not found: {url}")
@@ -249,9 +247,7 @@ class AsyncUnsplash:
                 break
             current_params = current_params.with_page(current_params.page + 1)
 
-    async def aiter_wallpapers(
-        self, params: UnsplashSearchParams
-    ) -> AsyncIterator[UnsplashPhoto]:
+    async def aiter_wallpapers(self, params: UnsplashSearchParams) -> AsyncIterator[UnsplashPhoto]:
         """
         Async-iterate over every photo across all pages of search results.
 

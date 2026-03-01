@@ -94,14 +94,10 @@ class Unsplash:
         params: dict[str, Any] | None = None,
         attempt: int = 0,
     ) -> httpx.Response:
-        response = self._client.request(
-            method, url, params=params, headers=self._auth_headers()
-        )
+        response = self._client.request(method, url, params=params, headers=self._auth_headers())
 
         if response.status_code == 401:
-            raise AuthenticationError(
-                "Unsplash authentication failed. Check your access key."
-            )
+            raise AuthenticationError("Unsplash authentication failed. Check your access key.")
 
         if response.status_code == 404:
             raise NotFoundError(f"Resource not found: {url}")
