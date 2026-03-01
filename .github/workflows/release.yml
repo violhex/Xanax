@@ -39,6 +39,9 @@ jobs:
     needs: check
     if: needs.check.outputs.is_new == 'true'
     uses: ./.github/workflows/publish.yml
+    permissions:
+      id-token: write
+      contents: read
 
   release:
     name: Create GitHub release
