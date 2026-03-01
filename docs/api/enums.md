@@ -8,6 +8,8 @@ from xanax.enums import Sort
 Sort.TOPLIST == "toplist"  # True
 ```
 
+## Wallhaven enumerations
+
 ::: xanax.enums.Category
 
 ::: xanax.enums.Purity
@@ -21,3 +23,15 @@ Sort.TOPLIST == "toplist"  # True
 ::: xanax.enums.Color
 
 ::: xanax.enums.FileType
+
+---
+
+## Unsplash enumerations
+
+::: xanax.sources.unsplash.enums.UnsplashOrientation
+
+::: xanax.sources.unsplash.enums.UnsplashColor
+
+::: xanax.sources.unsplash.enums.UnsplashOrderBy
+
+::: xanax.sources.unsplash.enums.UnsplashContentFilter

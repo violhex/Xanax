@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.2.1
+
+*Released 2026-03-01*
+
+### New features
+
+- **Multi-source architecture** — `xanax.sources` package introduces the `WallpaperSource` and `AsyncWallpaperSource` protocols. Any source client satisfying `download()` and `iter_wallpapers()` fits the protocol, enabling interchangeable source-agnostic code.
+- **Unsplash source** — `Unsplash` and `AsyncUnsplash` clients for royalty-free photography via the Unsplash API v1.
+  - `search(UnsplashSearchParams)` — search by query with orientation, color, order, per-page, and content-filter options.
+  - `photo(id)` — fetch a full photo object (includes EXIF, location, tags).
+  - `random(params=None)` — retrieve a single random photo, optionally filtered by collection, topic, username, query, or orientation.
+  - `download(photo, path=None)` — two-step download: triggers attribution tracking at `download_location` (required by Unsplash ToS), then fetches image bytes from the CDN.
+  - `iter_pages(params)` / `iter_wallpapers(params)` — auto-paginating generators.
+  - `aiter_pages(params)` / `aiter_wallpapers(params)` — async equivalents.
+- **Access key resolution** — `UNSPLASH_ACCESS_KEY` environment variable, mirroring the existing `WALLHAVEN_API_KEY` pattern.
+- **`UnsplashPhoto.resolution`** and **`UnsplashPhoto.aspect_ratio`** — convenience properties matching the Wallhaven `Wallpaper` model's interface.
+- **Retry on 429** — `Unsplash`/`AsyncUnsplash` reuse `RateLimitHandler` for configurable exponential backoff.
+
+---
+
 ## v0.2.0
 
 *Released 2026-02-28*

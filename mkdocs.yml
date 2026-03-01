@@ -1,5 +1,5 @@
 site_name: xanax
-site_description: A clean, type-safe Python client for the Wallhaven.cc API v1
+site_description: A clean, type-safe Python client for wallpaper APIs (Wallhaven, Unsplash)
 site_url: https://xanax.readthedocs.io
 repo_url: https://github.com/violhex/xanax
 repo_name: violhex/xanax
@@ -78,10 +78,13 @@ nav:
     - Downloading: guide/downloading.md
     - Collections: guide/collections.md
     - Error Handling: guide/error-handling.md
+  - Sources:
+    - Unsplash: sources/unsplash.md
   - API Reference:
     - Clients: api/clients.md
     - Search Parameters: api/search.md
     - Models: api/models.md
     - Enumerations: api/enums.md
     - Errors: api/errors.md
+    - Sources API: api/sources.md
   - Changelog: changelog.md
