@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Documentation
+    url: https://xanax.readthedocs.io
+    about: Check the docs before opening an issue — your question may already be answered.
+  - name: Wallhaven API docs
+    url: https://wallhaven.cc/help/api
+    about: Issues with the Wallhaven API itself should be directed to Wallhaven.

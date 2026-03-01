@@ -1,0 +1,45 @@
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - pyproject.toml
+          - uv.lock
+          - docs/requirements.txt
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - mkdocs.yml
+          - .readthedocs.yaml
+          - "*.md"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - tests/**
+
+github-actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
+
+async:
+  - changed-files:
+      - any-glob-to-any-file:
+          - xanax/async_client.py
+
+core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - xanax/client.py
+          - xanax/auth.py
+          - xanax/rate_limit.py
+          - xanax/errors.py
+
+models:
+  - changed-files:
+      - any-glob-to-any-file:
+          - xanax/models.py
+          - xanax/enums.py
+          - xanax/search.py
+          - xanax/pagination.py
