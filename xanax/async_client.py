@@ -313,9 +313,7 @@ class AsyncXanax:
             # Carry forward seed returned by the API (required for RANDOM sort pagination)
             if helper.seed is not None:
                 update["seed"] = helper.seed
-            current_params = SearchParams(
-                **{**current_params.model_dump(mode="python"), **update}
-            )
+            current_params = SearchParams(**{**current_params.model_dump(mode="python"), **update})
 
     async def aiter_wallpapers(self, params: SearchParams) -> AsyncIterator[Wallpaper]:
         """
