@@ -278,4 +278,4 @@ uv run ruff check xanax/
 
 ## License
 
-MIT
+BSD 3-Clause
