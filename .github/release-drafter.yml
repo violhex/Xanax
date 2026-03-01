@@ -1,0 +1,59 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+tag-prefix: "v"
+
+# Determine the next version from PR labels
+version-resolver:
+  major:
+    labels:
+      - breaking-change
+  minor:
+    labels:
+      - enhancement
+      - feature
+  patch:
+    labels:
+      - bug
+      - dependencies
+      - security
+  default: patch
+
+# Group PRs into changelog sections
+categories:
+  - title: "Breaking changes"
+    labels:
+      - breaking-change
+  - title: "New features"
+    labels:
+      - enhancement
+      - feature
+  - title: "Bug fixes"
+    labels:
+      - bug
+  - title: "Security"
+    labels:
+      - security
+  - title: "Dependencies"
+    labels:
+      - dependencies
+  - title: "Documentation"
+    labels:
+      - documentation
+  - title: "Other changes"
+    labels:
+      - tests
+      - github-actions
+      - core
+      - models
+      - async
+
+exclude-labels:
+  - skip-changelog
+
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+change-title-escapes: '\<*_&'
+
+template: |
+  ## Changes
+
+  $CHANGES
