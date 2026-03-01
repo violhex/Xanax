@@ -4,7 +4,7 @@ Tests for xanax enums.
 
 import pytest
 
-from xanax.enums import Category, Color, Order, Purity, Ratio, Sort, TopRange, Resolution, Seed
+from xanax.enums import Category, Color, Order, Purity, Ratio, Resolution, Seed, Sort, TopRange
 
 
 class TestCategory:

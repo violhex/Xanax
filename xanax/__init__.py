@@ -5,7 +5,9 @@ This library provides a simple and safe interface to interact with
 the Wallhaven wallpaper API. All responses are parsed into typed
 models, and invalid parameters are validated before making requests.
 
-Example usage:
+Both synchronous and asynchronous clients are available.
+
+Example usage (sync):
     from xanax import Xanax, SearchParams, Purity
 
     client = Xanax(api_key="your-api-key")
@@ -19,8 +21,17 @@ Example usage:
 
     for wallpaper in results.data:
         print(wallpaper.resolution, wallpaper.path)
+
+Example usage (async):
+    from xanax import AsyncXanax, SearchParams, Purity
+
+    async with AsyncXanax(api_key="your-api-key") as client:
+        results = await client.search(SearchParams(query="anime"))
+        async for wp in client.aiter_wallpapers(SearchParams(query="nature")):
+            print(wp.path)
 """
 
+from xanax.async_client import AsyncXanax
 from xanax.client import Xanax
 from xanax.enums import (
     Category,
@@ -41,9 +52,11 @@ from xanax.errors import (
     XanaxError,
 )
 from xanax.models import (
+    Avatar,
     Collection,
     CollectionListing,
     PaginationMeta,
+    QueryInfo,
     SearchResult,
     Tag,
     Thumbnails,
@@ -54,11 +67,12 @@ from xanax.models import (
 from xanax.pagination import PaginationHelper
 from xanax.search import SearchParams
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
-    # Client
+    # Clients
     "Xanax",
+    "AsyncXanax",
     # Errors
     "XanaxError",
     "AuthenticationError",
@@ -81,6 +95,7 @@ __all__ = [
     "Uploader",
     "Avatar",
     "Thumbnails",
+    "QueryInfo",
     "SearchResult",
     "PaginationMeta",
     "UserSettings",

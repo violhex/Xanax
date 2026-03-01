@@ -5,15 +5,23 @@ Provides helpers for navigating through paginated results
 and working with pagination metadata.
 """
 
-from xanax.models import PaginationMeta, SearchResult
+from xanax.models import PaginationMeta
 
 
 class PaginationHelper:
     """
     Helper class for navigating paginated search results.
 
-    This class provides utility methods for working with pagination
-    data from search results.
+    Wraps :class:`~xanax.models.PaginationMeta` and exposes clean properties
+    and methods for driving pagination loops.
+
+    Example:
+        results = client.search(params)
+        helper = PaginationHelper(results.meta)
+
+        if helper.has_next:
+            next_params = params.with_page(helper.next_page_number())
+            next_results = client.search(next_params)
     """
 
     def __init__(self, meta: PaginationMeta) -> None:
@@ -55,30 +63,13 @@ class PaginationHelper:
         return self._meta.seed
 
     def next_page_number(self) -> int | None:
-        """Get the next page number, or None if at last page."""
+        """Return the next page number, or None if already on the last page."""
         if self.has_next:
             return self._meta.current_page + 1
         return None
 
     def previous_page_number(self) -> int | None:
-        """Get the previous page number, or None if at first page."""
+        """Return the previous page number, or None if already on the first page."""
         if self.has_previous:
             return self._meta.current_page - 1
         return None
-
-
-def has_next_page(result: SearchResult) -> bool:
-    """Check if there are more pages available."""
-    return result.meta.current_page < result.meta.last_page
-
-
-def get_next_page(result: SearchResult) -> int | None:
-    """Get the next page number, or None if at the last page."""
-    if has_next_page(result):
-        return result.meta.current_page + 1
-    return None
-
-
-def get_total_pages(result: SearchResult) -> int:
-    """Get the total number of pages."""
-    return result.meta.last_page

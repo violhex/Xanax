@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
-from xanax.enums import Category, Color, FileType, Order, Purity, Ratio, Sort, TopRange
+from xanax.enums import Category, Color, FileType, Order, Purity, Ratio, Resolution, Sort, TopRange
 from xanax.errors import ValidationError
 
 
@@ -18,7 +18,12 @@ class SearchParams(BaseModel):
     Parameters for wallpaper search.
 
     This model validates all search parameters and ensures
-    only valid combinations are used.
+    only valid combinations are used. Invalid combinations
+    raise :class:`~xanax.errors.ValidationError` immediately, before
+    any network request is made.
+
+    The default ``categories`` includes all three (general, anime, people),
+    matching Wallhaven's own default search behaviour.
 
     Example:
         params = SearchParams(
@@ -32,8 +37,8 @@ class SearchParams(BaseModel):
 
     query: str | None = Field(default=None, description="Search query string")
     categories: list[Category] = Field(
-        default_factory=lambda: [Category.GENERAL],
-        description="Categories to search",
+        default_factory=lambda: list(Category),
+        description="Categories to search (default: all three)",
     )
     purity: list[Purity] = Field(
         default_factory=lambda: [Purity.SFW],
@@ -53,11 +58,11 @@ class SearchParams(BaseModel):
     )
     resolutions: list[str] = Field(
         default_factory=list,
-        description="Exact resolutions to search for",
+        description="Exact resolutions to filter by (e.g., '1920x1080')",
     )
     ratios: list[str] = Field(
         default_factory=list,
-        description="Aspect ratios to search for",
+        description="Aspect ratios to filter by (e.g., '16x9' or '16:9')",
     )
     colors: list[Color] = Field(
         default_factory=list,
@@ -131,9 +136,6 @@ class SearchParams(BaseModel):
                 f"Current sorting: {self.sorting.value}"
             )
 
-        if self.seed is not None and self.sorting != Sort.RANDOM:
-            pass
-
     def to_query_params(self) -> dict[str, Any]:
         """
         Convert parameters to API query parameters.
@@ -185,69 +187,24 @@ class SearchParams(BaseModel):
 
     def with_page(self, page: int) -> "SearchParams":
         """
-        Create a new SearchParams with updated page number.
+        Return a new SearchParams with the page number updated.
 
         Args:
             page: New page number.
 
         Returns:
-            New SearchParams instance with updated page.
+            New SearchParams instance with the page updated and all other fields preserved.
         """
-        return SearchParams(
-            query=self.query,
-            categories=self.categories,
-            purity=self.purity,
-            sorting=self.sorting,
-            order=self.order,
-            top_range=self.top_range,
-            resolutions=self.resolutions,
-            ratios=self.ratios,
-            colors=self.colors,
-            page=page,
-            seed=self.seed,
-            file_type=self.file_type,
-            like=self.like,
-        )
+        return SearchParams(**{**self.model_dump(mode="python"), "page": page})
 
     def with_seed(self, seed: str) -> "SearchParams":
         """
-        Create a new SearchParams with updated seed.
+        Return a new SearchParams with the seed updated.
 
         Args:
             seed: New seed value (6 alphanumeric characters).
 
         Returns:
-            New SearchParams instance with updated seed.
+            New SearchParams instance with the seed updated and all other fields preserved.
         """
-        return SearchParams(
-            query=self.query,
-            categories=self.categories,
-            purity=self.purity,
-            sorting=self.sorting,
-            order=self.order,
-            top_range=self.top_range,
-            resolutions=self.resolutions,
-            ratios=self.ratios,
-            colors=self.colors,
-            page=self.page,
-            seed=seed,
-            file_type=self.file_type,
-            like=self.like,
-        )
-
-
-class Resolution:
-    """Helper class for validating wallpaper resolutions."""
-
-    @staticmethod
-    def validate(resolution: str) -> bool:
-        parts = resolution.lower().split("x")
-        if len(parts) != 2:
-            return False
-
-        try:
-            width = int(parts[0])
-            height = int(parts[1])
-            return width >= 1 and height >= 1
-        except ValueError:
-            return False
+        return SearchParams(**{**self.model_dump(mode="python"), "seed": seed})

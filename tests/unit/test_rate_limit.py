@@ -2,9 +2,9 @@
 Tests for xanax rate limit handler.
 """
 
-import pytest
-
 from unittest.mock import Mock
+
+import pytest
 
 from xanax.errors import RateLimitError
 from xanax.rate_limit import RateLimitHandler, check_rate_limit

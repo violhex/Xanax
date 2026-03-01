@@ -2,7 +2,6 @@
 Tests for xanax error classes.
 """
 
-import pytest
 
 from xanax.errors import (
     APIError,

@@ -7,6 +7,7 @@ rate limit detection and optional retry functionality.
 
 import time
 from contextlib import suppress
+from typing import NoReturn
 
 import httpx
 
@@ -93,7 +94,7 @@ class RateLimitHandler:
         """
         return response.status_code == 429 and self._enabled and attempt < self._max_retries
 
-    def handle_rate_limit(self, response: httpx.Response) -> None:
+    def handle_rate_limit(self, response: httpx.Response) -> NoReturn:
         """
         Handle a rate limit response by raising appropriate error.
 

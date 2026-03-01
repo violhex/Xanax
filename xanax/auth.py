@@ -3,27 +3,32 @@ Authentication handling for Wallhaven API.
 
 Handles API key storage and header management.
 The API key is never logged or exposed in any output.
+
+The API key can be supplied directly or via the WALLHAVEN_API_KEY environment variable.
 """
 
-from typing import Any
+import os
 
 
 class AuthHandler:
     """
     Manages authentication for Wallhaven API requests.
 
-    Supports two authentication methods:
-    1. Header-based (preferred) - uses X-API-Key header
-    2. Query parameter (fallback) - uses apikey query parameter
+    Uses header-based authentication via the X-API-Key header.
 
-    The API key is stored securely and never exposed in __repr__
+    The API key is resolved in the following order:
+    1. Explicit ``api_key`` argument
+    2. ``WALLHAVEN_API_KEY`` environment variable
+
+    The API key is stored securely and never exposed in ``__repr__``
     or any string representations.
     """
 
     API_HEADER = "X-API-Key"
-    API_QUERY_PARAM = "apikey"
 
     def __init__(self, api_key: str | None = None) -> None:
+        if api_key is None:
+            api_key = os.environ.get("WALLHAVEN_API_KEY")
         self._api_key = api_key
 
     @property
@@ -38,26 +43,13 @@ class AuthHandler:
 
     def get_headers(self) -> dict[str, str]:
         """
-        Get headers for authenticated request.
+        Get headers for an authenticated request.
 
         Returns:
-            Dictionary containing the X-API-Key header if key is set.
+            Dictionary containing the X-API-Key header if a key is configured.
         """
         if self.has_api_key and self._api_key:
             return {self.API_HEADER: self._api_key}
-        return {}
-
-    def get_query_params(self) -> dict[str, Any]:
-        """
-        Get query parameters for authenticated request.
-
-        This is the fallback method if header-based auth is not used.
-
-        Returns:
-            Dictionary containing the apikey parameter if key is set.
-        """
-        if self.has_api_key:
-            return {self.API_QUERY_PARAM: self._api_key}
         return {}
 
     def check_nsfw_access(self, purity_includes_nsfw: bool) -> bool:

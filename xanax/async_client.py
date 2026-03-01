@@ -1,11 +1,12 @@
 """
-Main Xanax client for interacting with Wallhaven API.
+Async Xanax client for interacting with Wallhaven API.
 
-This is the primary interface for the library. All API interactions
-go through this client class.
+Provides an asynchronous interface identical to :class:`~xanax.client.Xanax`
+but built on ``httpx.AsyncClient`` for use with ``asyncio``.
 """
 
-from collections.abc import Iterator
+import asyncio
+from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
@@ -31,22 +32,22 @@ from xanax.rate_limit import RateLimitHandler
 from xanax.search import SearchParams
 
 
-class Xanax:
+class AsyncXanax:
     """
-    Main client for Wallhaven API v1.
+    Async client for Wallhaven API v1.
 
-    This client provides methods to interact with all Wallhaven API endpoints.
+    Drop-in async counterpart to :class:`~xanax.client.Xanax`. All public methods
+    are coroutines. Use as an async context manager for automatic resource cleanup.
+
     The API key can be passed directly or read from the ``WALLHAVEN_API_KEY``
     environment variable.
 
     Example:
-        client = Xanax(api_key="your-api-key")
+        async with AsyncXanax(api_key="your-api-key") as client:
+            results = await client.search(SearchParams(query="anime"))
 
-        params = SearchParams(query="anime", purity=[Purity.SFW])
-        results = client.search(params)
-
-        for wallpaper in results.data:
-            print(wallpaper.resolution, wallpaper.path)
+            async for wallpaper in client.aiter_wallpapers(SearchParams(query="nature")):
+                print(wallpaper.path)
 
     Args:
         api_key: Wallhaven API key for authenticated requests.
@@ -68,7 +69,7 @@ class Xanax:
     ) -> None:
         self._auth = AuthHandler(api_key=api_key)
         self._rate_limit = RateLimitHandler(max_retries=max_retries)
-        self._client = httpx.Client(
+        self._client = httpx.AsyncClient(
             timeout=timeout,
             follow_redirects=True,
         )
@@ -82,13 +83,13 @@ class Xanax:
         if Purity.NSFW in purity and not self._auth.has_api_key:
             raise AuthenticationError(
                 "NSFW content requires an API key. "
-                "Please provide your API key when creating the Xanax client."
+                "Please provide your API key when creating the AsyncXanax client."
             )
 
     def _build_url(self, endpoint: str) -> str:
         return f"{self.BASE_URL}/{endpoint.lstrip('/')}"
 
-    def _request(
+    async def _request(
         self,
         method: str,
         url: str,
@@ -96,7 +97,7 @@ class Xanax:
         attempt: int = 0,
     ) -> httpx.Response:
         headers = self._auth.get_headers()
-        response = self._client.request(method, url, params=params, headers=headers)
+        response = await self._client.request(method, url, params=params, headers=headers)
 
         if response.status_code == 401:
             raise AuthenticationError("Authentication failed. Please check your API key.")
@@ -106,8 +107,9 @@ class Xanax:
 
         if response.status_code == 429:
             if self._rate_limit.should_retry(response, attempt):
-                self._rate_limit.wait_before_retry(attempt)
-                return self._request(method, url, params, attempt + 1)
+                delay = self._rate_limit.calculate_delay(attempt)
+                await asyncio.sleep(delay)
+                return await self._request(method, url, params, attempt + 1)
             self._rate_limit.handle_rate_limit(response)
 
         if response.status_code >= 400:
@@ -118,7 +120,7 @@ class Xanax:
 
         return response
 
-    def wallpaper(self, wallpaper_id: str) -> Wallpaper:
+    async def wallpaper(self, wallpaper_id: str) -> Wallpaper:
         """
         Get information about a specific wallpaper.
 
@@ -133,12 +135,12 @@ class Xanax:
             NotFoundError: If the wallpaper does not exist.
         """
         url = self._build_url(f"w/{wallpaper_id}")
-        response = self._request("GET", url)
+        response = await self._request("GET", url)
 
         data = response.json()
         return Wallpaper(**data["data"])
 
-    def search(self, params: SearchParams) -> SearchResult:
+    async def search(self, params: SearchParams) -> SearchResult:
         """
         Search for wallpapers with the given parameters.
 
@@ -157,12 +159,12 @@ class Xanax:
         url = self._build_url("search")
         query_params = params.to_query_params()
 
-        response = self._request("GET", url, params=query_params)
+        response = await self._request("GET", url, params=query_params)
         data = response.json()
 
         return SearchResult(**data)
 
-    def tag(self, tag_id: int) -> Tag:
+    async def tag(self, tag_id: int) -> Tag:
         """
         Get information about a specific tag.
 
@@ -176,12 +178,12 @@ class Xanax:
             NotFoundError: If the tag does not exist.
         """
         url = self._build_url(f"tag/{tag_id}")
-        response = self._request("GET", url)
+        response = await self._request("GET", url)
 
         data = response.json()
         return Tag(**data["data"])
 
-    def settings(self) -> UserSettings:
+    async def settings(self) -> UserSettings:
         """
         Get the authenticated user's settings.
 
@@ -196,16 +198,16 @@ class Xanax:
         if not self._auth.has_api_key:
             raise AuthenticationError(
                 "User settings require an API key. "
-                "Please provide your API key when creating the Xanax client."
+                "Please provide your API key when creating the AsyncXanax client."
             )
 
         url = self._build_url("settings")
-        response = self._request("GET", url)
+        response = await self._request("GET", url)
 
         data = response.json()
         return UserSettings(**data["data"])
 
-    def collections(self, username: str | None = None) -> list[Collection]:
+    async def collections(self, username: str | None = None) -> list[Collection]:
         """
         Get collections for the authenticated user or another user.
 
@@ -225,7 +227,7 @@ class Xanax:
         if username is None and not self._auth.has_api_key:
             raise AuthenticationError(
                 "Accessing your own collections requires an API key. "
-                "Please provide your API key when creating the Xanax client."
+                "Please provide your API key when creating the AsyncXanax client."
             )
 
         if username:
@@ -233,12 +235,12 @@ class Xanax:
         else:
             url = self._build_url("collections")
 
-        response = self._request("GET", url)
+        response = await self._request("GET", url)
 
         data = response.json()
         return [Collection(**item) for item in data["data"]]
 
-    def collection(self, username: str, collection_id: int) -> CollectionListing:
+    async def collection(self, username: str, collection_id: int) -> CollectionListing:
         """
         Get wallpapers in a specific collection.
 
@@ -254,12 +256,12 @@ class Xanax:
             NotFoundError: If the collection does not exist.
         """
         url = self._build_url(f"collections/{username}/{collection_id}")
-        response = self._request("GET", url)
+        response = await self._request("GET", url)
 
         data = response.json()
         return CollectionListing(**data)
 
-    def download(self, wallpaper: Wallpaper, path: Path | str | None = None) -> bytes:
+    async def download(self, wallpaper: Wallpaper, path: Path | str | None = None) -> bytes:
         """
         Download the raw image bytes of a wallpaper.
 
@@ -271,16 +273,16 @@ class Xanax:
         Returns:
             Raw image bytes.
         """
-        response = self._client.get(wallpaper.path, follow_redirects=True)
+        response = await self._client.get(wallpaper.path, follow_redirects=True)
         response.raise_for_status()
         content = response.content
         if path is not None:
             Path(path).write_bytes(content)
         return content
 
-    def iter_pages(self, params: SearchParams) -> Iterator[SearchResult]:
+    async def aiter_pages(self, params: SearchParams) -> AsyncIterator[SearchResult]:
         """
-        Iterate over all pages of search results automatically.
+        Async-iterate over all pages of search results automatically.
 
         Each iteration yields a full :class:`~xanax.models.SearchResult` page.
         Pagination is handled transparently, including carrying forward any seed
@@ -293,13 +295,13 @@ class Xanax:
             SearchResult for each page, starting from the page in ``params``.
 
         Example:
-            for page in client.iter_pages(SearchParams(query="anime")):
+            async for page in client.aiter_pages(SearchParams(query="anime")):
                 for wallpaper in page.data:
                     print(wallpaper.id)
         """
         current_params = params
         while True:
-            result = self.search(current_params)
+            result = await self.search(current_params)
             yield result
             helper = PaginationHelper(result.meta)
             if not helper.has_next:
@@ -315,11 +317,11 @@ class Xanax:
                 **{**current_params.model_dump(mode="python"), **update}
             )
 
-    def iter_wallpapers(self, params: SearchParams) -> Iterator[Wallpaper]:
+    async def aiter_wallpapers(self, params: SearchParams) -> AsyncIterator[Wallpaper]:
         """
-        Iterate over every wallpaper across all pages of search results.
+        Async-iterate over every wallpaper across all pages of search results.
 
-        A convenience wrapper around :meth:`iter_pages` that flattens pages into
+        A convenience wrapper around :meth:`aiter_pages` that flattens pages into
         individual :class:`~xanax.models.Wallpaper` objects.
 
         Args:
@@ -329,22 +331,23 @@ class Xanax:
             Wallpaper objects across all pages.
 
         Example:
-            for wp in client.iter_wallpapers(SearchParams(query="anime")):
+            async for wp in client.aiter_wallpapers(SearchParams(query="anime")):
                 print(wp.path)
         """
-        for page in self.iter_pages(params):
-            yield from page.data
+        async for page in self.aiter_pages(params):
+            for wallpaper in page.data:
+                yield wallpaper
 
-    def close(self) -> None:
-        """Close the underlying HTTP client."""
-        self._client.close()
+    async def aclose(self) -> None:
+        """Close the underlying async HTTP client."""
+        await self._client.aclose()
 
-    def __enter__(self) -> "Xanax":
+    async def __aenter__(self) -> "AsyncXanax":
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        self.close()
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        await self.aclose()
 
     def __repr__(self) -> str:
         auth_status = "authenticated" if self.is_authenticated else "unauthenticated"
-        return f"Xanax({auth_status})"
+        return f"AsyncXanax({auth_status})"

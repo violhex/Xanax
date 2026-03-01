@@ -2,15 +2,12 @@
 Tests for xanax models.
 """
 
-import pytest
 
 from xanax.enums import Category, Purity
 from xanax.models import (
     Avatar,
     Collection,
-    CollectionListing,
     PaginationMeta,
-    SearchResult,
     Tag,
     Thumbnails,
     Uploader,
@@ -212,4 +209,15 @@ class TestCollection:
         collection = Collection(**data)
         assert collection.id == 15
         assert collection.label == "Default"
-        assert collection.public == 1
+        assert collection.public is True
+
+    def test_collection_public_false(self):
+        data = {
+            "id": 16,
+            "label": "Private",
+            "views": 0,
+            "public": 0,
+            "count": 5,
+        }
+        collection = Collection(**data)
+        assert collection.public is False

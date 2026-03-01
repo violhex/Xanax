@@ -1,0 +1,87 @@
+site_name: xanax
+site_description: A clean, type-safe Python client for the Wallhaven.cc API v1
+site_url: https://xanax.readthedocs.io
+repo_url: https://github.com/violhex/xanax
+repo_name: violhex/xanax
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_toc_entry: true
+            heading_level: 2
+            members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+            docstring_style: google
+            merge_init_into_class: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+  - User Guide:
+    - Authentication: guide/authentication.md
+    - Searching: guide/searching.md
+    - Pagination: guide/pagination.md
+    - Async Client: guide/async.md
+    - Downloading: guide/downloading.md
+    - Collections: guide/collections.md
+    - Error Handling: guide/error-handling.md
+  - API Reference:
+    - Clients: api/clients.md
+    - Search Parameters: api/search.md
+    - Models: api/models.md
+    - Enumerations: api/enums.md
+    - Errors: api/errors.md
+  - Changelog: changelog.md

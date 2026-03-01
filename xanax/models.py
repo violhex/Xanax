@@ -137,7 +137,7 @@ class Collection(BaseModel):
     id: int
     label: str
     views: int
-    public: int
+    public: bool
     count: int
 
 
