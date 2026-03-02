@@ -40,14 +40,16 @@ class Unsplash:
     it straightforward to write source-agnostic code.
 
     Example:
-        unsplash = Unsplash(access_key="your-access-key")
+        .. code-block:: python
 
-        result = unsplash.search(UnsplashSearchParams(query="mountains"))
-        for photo in result.results:
-            print(photo.id, photo.resolution)
+            unsplash = Unsplash(access_key="your-access-key")
 
-        photo = unsplash.random()
-        data = unsplash.download(photo)
+            result = unsplash.search(UnsplashSearchParams(query="mountains"))
+            for photo in result.results:
+                print(photo.id, photo.resolution)
+
+            photo = unsplash.random()
+            data = unsplash.download(photo)
 
     Args:
         access_key: Unsplash API access key. Falls back to the

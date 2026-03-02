@@ -31,14 +31,16 @@ class RedditParams(BaseModel, frozen=True):
         It is silently ignored for all other sort orders.
 
     Example:
-        params = RedditParams(
-            subreddit="EarthPorn",
-            sort=RedditSort.TOP,
-            time_filter=RedditTimeFilter.WEEK,
-            limit=50,
-        )
-        for post in reddit.iter_media(params):
-            reddit.download(post, path=f"{post.id}.jpg")
+        .. code-block:: python
+
+            params = RedditParams(
+                subreddit="EarthPorn",
+                sort=RedditSort.TOP,
+                time_filter=RedditTimeFilter.WEEK,
+                limit=50,
+            )
+            for post in reddit.iter_media(params):
+                reddit.download(post, path=f"{post.id}.jpg")
 
     Args:
         subreddit: Target subreddit(s). Use ``+`` to combine multiple, e.g.

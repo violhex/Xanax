@@ -150,11 +150,13 @@ class UnsplashSearchResult(BaseModel):
     Paginated search results from ``GET /search/photos``.
 
     Example:
-        result = unsplash.search(UnsplashSearchParams(query="mountains"))
-        print(result.total)         # total matching photos
-        print(result.total_pages)   # number of pages available
-        for photo in result.results:
-            print(photo.id)
+        .. code-block:: python
+
+            result = unsplash.search(UnsplashSearchParams(query="mountains"))
+            print(result.total)         # total matching photos
+            print(result.total_pages)   # number of pages available
+            for photo in result.results:
+                print(photo.id)
     """
 
     total: int = Field(description="Total number of photos matching the query")

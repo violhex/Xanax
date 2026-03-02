@@ -27,7 +27,7 @@
 
 ### Migration guide
 
-
+Rename client classes and iterator methods as described in the breaking changes above.
 
 ---
 

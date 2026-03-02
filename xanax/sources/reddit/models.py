@@ -29,9 +29,11 @@ class RedditPost(BaseModel):
     :attr:`gallery_id`.
 
     Example:
-        post = reddit.post("abc123")
-        if post:
-            data = reddit.download(post)
+        .. code-block:: python
+
+            post = reddit.post("abc123")
+            if post:
+                data = reddit.download(post)
     """
 
     id: str = Field(description="Base-36 post ID (or '<post_id>_<media_id>' for gallery items)")
@@ -198,11 +200,13 @@ class RedditListing(BaseModel):
     A paginated page of posts from a subreddit listing endpoint.
 
     Example:
-        listing = reddit.listing(RedditParams(subreddit="EarthPorn"))
-        for post in listing.posts:
-            print(post.id, post.url)
-        if listing.after:
-            next_listing = reddit.listing(params.with_after(listing.after))
+        .. code-block:: python
+
+            listing = reddit.listing(RedditParams(subreddit="EarthPorn"))
+            for post in listing.posts:
+                print(post.id, post.url)
+            if listing.after:
+                next_listing = reddit.listing(params.with_after(listing.after))
     """
 
     posts: list[RedditPost] = Field(description="Media posts on this page (non-media filtered out)")

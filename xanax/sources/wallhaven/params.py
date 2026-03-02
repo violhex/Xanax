@@ -35,13 +35,15 @@ class SearchParams(BaseModel):
     matching Wallhaven's own default search behaviour.
 
     Example:
-        params = SearchParams(
-            query="+anime -sketch",
-            categories=[Category.ANIME],
-            purity=[Purity.SFW],
-            sorting=Sort.TOPLIST,
-            top_range=TopRange.ONE_MONTH,
-        )
+        .. code-block:: python
+
+            params = SearchParams(
+                query="+anime -sketch",
+                categories=[Category.ANIME],
+                purity=[Purity.SFW],
+                sorting=Sort.TOPLIST,
+                top_range=TopRange.ONE_MONTH,
+            )
     """
 
     query: str | None = Field(default=None, description="Search query string")

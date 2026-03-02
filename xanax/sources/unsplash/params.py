@@ -26,14 +26,16 @@ class UnsplashSearchParams(BaseModel):
     matching the Unsplash API's own defaults.
 
     Example:
-        params = UnsplashSearchParams(
-            query="mountains",
-            orientation=UnsplashOrientation.LANDSCAPE,
-            color=UnsplashColor.BLUE,
-            order_by=UnsplashOrderBy.LATEST,
-            per_page=30,
-        )
-        result = unsplash.search(params)
+        .. code-block:: python
+
+            params = UnsplashSearchParams(
+                query="mountains",
+                orientation=UnsplashOrientation.LANDSCAPE,
+                color=UnsplashColor.BLUE,
+                order_by=UnsplashOrderBy.LATEST,
+                per_page=30,
+            )
+            result = unsplash.search(params)
 
     Args:
         query: Search terms. Required.
@@ -124,11 +126,13 @@ class UnsplashRandomParams(BaseModel):
         in the same request. The API will return an error if both are provided.
 
     Example:
-        params = UnsplashRandomParams(
-            query="forest",
-            orientation=UnsplashOrientation.LANDSCAPE,
-        )
-        photo = unsplash.random(params)
+        .. code-block:: python
+
+            params = UnsplashRandomParams(
+                query="forest",
+                orientation=UnsplashOrientation.LANDSCAPE,
+            )
+            photo = unsplash.random(params)
 
     Args:
         collections: Collection IDs to restrict the random pool to.

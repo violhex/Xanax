@@ -56,14 +56,16 @@ class Reddit:
     ``platform:app_id/version (by u/username)``
 
     Example:
-        reddit = Reddit(
-            client_id="...",
-            client_secret="...",
-            user_agent="python:xanax/0.3.0 (by u/yourname)",
-        )
+        .. code-block:: python
 
-        for post in reddit.iter_media(RedditParams(subreddit="EarthPorn", sort=RedditSort.TOP)):
-            reddit.download(post, path=f"{post.id}.jpg")
+            reddit = Reddit(
+                client_id="...",
+                client_secret="...",
+                user_agent="python:xanax/0.3.0 (by u/yourname)",
+            )
+
+            for post in reddit.iter_media(RedditParams(subreddit="EarthPorn", sort=RedditSort.TOP)):
+                reddit.download(post, path=f"{post.id}.jpg")
 
     Args:
         client_id: Reddit app client ID. Falls back to ``REDDIT_CLIENT_ID``.

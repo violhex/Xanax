@@ -10,8 +10,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 project = "xanax"
 copyright = "2024, xanax contributors"
 author = "xanax"
-release = "0.3.0"
-version = "0.3.0"
+release = "0.3.1"
+version = "0.3.1"
 
 # -- General configuration -----------------------------------------------------
 
@@ -26,6 +26,11 @@ extensions = [
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # -- MyST configuration --------------------------------------------------------
 
@@ -99,5 +104,5 @@ html_theme_options = {
     ],
 }
 
-html_static_path = ["_static"]
+html_static_path = []
 html_css_files = []
