@@ -12,6 +12,7 @@ via :meth:`~xanax.sources.reddit.client.Reddit._expand_gallery`.
 """
 
 from datetime import UTC, datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -68,7 +69,7 @@ class RedditPost(BaseModel):
     )
 
     @classmethod
-    def from_reddit_data(cls, data: dict) -> "RedditPost | None":
+    def from_reddit_data(cls, data: dict[str, Any]) -> "RedditPost | None":
         """
         Build a :class:`RedditPost` from a raw Reddit API post dict.
 

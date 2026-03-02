@@ -347,7 +347,7 @@ class AsyncReddit:
 
                 yield post
 
-    def _expand_gallery(self, post_data: dict) -> list[RedditPost]:
+    def _expand_gallery(self, post_data: dict[str, Any]) -> list[RedditPost]:
         """
         Expand a gallery post into individual :class:`RedditPost` objects.
 
