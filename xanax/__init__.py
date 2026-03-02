@@ -79,7 +79,7 @@ from xanax.sources.wallhaven.models import (
 )
 from xanax.sources.wallhaven.params import SearchParams
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 # Backwards-compatible aliases — Xanax/AsyncXanax renamed to Wallhaven/AsyncWallhaven in v0.3.0.
 Xanax = Wallhaven

@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.2
+
+*Released 2026-03-02*
+
+### Fixes
+
+- **Sphinx docs** — add `source_suffix` to `conf.py` so all `.md` pages are built; remove conflicting `index.md` that was shadowing `index.rst` and causing all toctrees to be ignored.
+- **Docstrings** — add explicit `.. code-block:: python` to all `Example:` sections; Napoleon does not wrap section content in literal blocks, causing `for x:` and `if x:` to be misinterpreted as RST definition list terms.
+- **PyPI metadata** — add keywords and classifiers; point Documentation and Changelog URLs to `/en/stable/`.
+- **README** — rewritten for v0.3.x multi-source API; adds Unsplash and Reddit examples, source-agnostic protocol usage, and updated badges.
+
+---
+
 ## v0.3.0
 
 *Released 2026-03-01*

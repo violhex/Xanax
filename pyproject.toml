@@ -1,6 +1,6 @@
 [project]
 name = "xanax"
-version = "0.3.1"
+version = "0.3.2"
 description = "A clean, type-safe Python client for multi-source media APIs (Wallhaven, Unsplash, Reddit)"
 readme = "README.md"
 requires-python = ">=3.12"
