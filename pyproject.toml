@@ -8,8 +8,22 @@ license = { text = "BSD-3-Clause" }
 authors = [
     { name = "xanax" }
 ]
+keywords = [
+    "wallhaven", "unsplash", "reddit",
+    "wallpaper", "photo", "image", "media",
+    "api", "client", "async", "typed", "pydantic",
+]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Multimedia",
+    "Typing :: Typed",
+    "Framework :: AsyncIO",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
 ]
@@ -20,9 +34,9 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/violhex/xanax"
-Documentation = "https://xanax.readthedocs.io"
+Documentation = "https://xanax.readthedocs.io/en/stable/"
 Repository = "https://github.com/violhex/xanax"
-Changelog = "https://xanax.readthedocs.io/en/latest/changelog/"
+Changelog = "https://xanax.readthedocs.io/en/stable/changelog/"
 "Bug Tracker" = "https://github.com/violhex/xanax/issues"
 
 [project.optional-dependencies]
