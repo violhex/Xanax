@@ -1,12 +1,12 @@
 """
-Tests for xanax search parameters.
+Tests for Wallhaven search parameters.
 """
 
 import pytest
 
-from xanax.enums import Category, Color, Order, Purity, Sort, TopRange
 from xanax.errors import ValidationError
-from xanax.search import SearchParams
+from xanax.sources.wallhaven.enums import Category, Color, Order, Purity, Sort, TopRange
+from xanax.sources.wallhaven.params import SearchParams
 
 
 class TestSearchParams:

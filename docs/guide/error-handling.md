@@ -16,7 +16,7 @@ XanaxError
 ## Full example
 
 ```python
-from xanax import Xanax, SearchParams
+from xanax import Wallhaven, SearchParams
 from xanax.errors import (
     AuthenticationError,
     RateLimitError,
@@ -26,7 +26,7 @@ from xanax.errors import (
     XanaxError,
 )
 
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 
 try:
     results = client.search(SearchParams(query="anime"))
@@ -52,7 +52,7 @@ Raised in two situations:
 2. You call a protected endpoint without an API key (raised locally, no request made)
 
 ```python
-client = Xanax()
+client = Wallhaven()
 
 try:
     client.settings()  # requires API key
@@ -76,7 +76,7 @@ except RateLimitError as e:
 To avoid handling this yourself, configure automatic retry:
 
 ```python
-client = Xanax(max_retries=3)  # retry up to 3 times with exponential backoff
+client = Wallhaven(max_retries=3)  # retry up to 3 times with exponential backoff
 ```
 
 With `max_retries=3`, the client waits `2^attempt` seconds between retries (1s, 2s, 4s). If all retries are exhausted, `RateLimitError` is raised.
@@ -132,11 +132,11 @@ The async client raises the same exceptions:
 
 ```python
 import asyncio
-from xanax import AsyncXanax, SearchParams
+from xanax import AsyncWallhaven, SearchParams
 from xanax.errors import RateLimitError
 
 async def main():
-    async with AsyncXanax(api_key="your-api-key", max_retries=3) as client:
+    async with AsyncWallhaven(api_key="your-api-key", max_retries=3) as client:
         try:
             result = await client.search(SearchParams(query="anime"))
         except RateLimitError as e:

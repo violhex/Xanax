@@ -239,9 +239,7 @@ class TestAsyncUnsplashRandom:
 
 class TestAsyncUnsplashDownload:
     @patch("xanax.sources.unsplash.async_client.httpx.AsyncClient")
-    async def test_download_triggers_tracking_then_fetches_cdn(
-        self, mock_client_cls: Mock
-    ) -> None:
+    async def test_download_triggers_tracking_then_fetches_cdn(self, mock_client_cls: Mock) -> None:
         """download() must call download_location first, then fetch the CDN URL."""
         # Use plain Mock for responses: httpx Response.json() is synchronous, not a coroutine
         tracking_response = Mock()
@@ -315,7 +313,7 @@ class TestAsyncUnsplashDownload:
 
 
 # ---------------------------------------------------------------------------
-# aiter_pages() / aiter_wallpapers()
+# aiter_pages() / aiter_media()
 # ---------------------------------------------------------------------------
 
 
@@ -368,9 +366,9 @@ class TestAsyncUnsplashIterPages:
         assert mock_client.request.call_count == 1
 
 
-class TestAsyncUnsplashIterWallpapers:
+class TestAsyncUnsplashIterMedia:
     @patch("xanax.sources.unsplash.async_client.httpx.AsyncClient")
-    async def test_aiter_wallpapers_flattens_pages(self, mock_client_cls: Mock) -> None:
+    async def test_aiter_media_flattens_pages(self, mock_client_cls: Mock) -> None:
         page1 = {"total": 20, "total_pages": 2, "results": [PHOTO_DATA]}
         page2 = {"total": 20, "total_pages": 2, "results": [PHOTO_DATA]}
 
@@ -383,7 +381,7 @@ class TestAsyncUnsplashIterWallpapers:
 
         client = AsyncUnsplash(access_key="key")
         photos = []
-        async for photo in client.aiter_wallpapers(UnsplashSearchParams(query="x")):
+        async for photo in client.aiter_media(UnsplashSearchParams(query="x")):
             photos.append(photo)
 
         assert len(photos) == 2

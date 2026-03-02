@@ -5,9 +5,9 @@
 ## Download to memory
 
 ```python
-from xanax import Xanax
+from xanax import Wallhaven
 
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 wallpaper = client.wallpaper("94x38z")
 
 image_bytes: bytes = client.download(wallpaper)
@@ -35,14 +35,14 @@ data = client.download(wallpaper, path="wallpaper.jpg")
 
 ## Async download
 
-`AsyncXanax.download()` works the same way:
+`AsyncWallhaven.download()` works the same way:
 
 ```python
 import asyncio
-from xanax import AsyncXanax
+from xanax import AsyncWallhaven
 
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         wallpaper = await client.wallpaper("94x38z")
         data = await client.download(wallpaper, path="wallpaper.jpg")
 
@@ -51,19 +51,19 @@ asyncio.run(main())
 
 ## Batch download
 
-Combine with `iter_wallpapers()` or `aiter_wallpapers()` to download multiple wallpapers:
+Combine with `iter_media()` or `aiter_media()` to download multiple wallpapers:
 
 ```python
 from pathlib import Path
-from xanax import Xanax, SearchParams, Sort
+from xanax import Wallhaven, SearchParams, Sort
 
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 output_dir = Path("wallpapers")
 output_dir.mkdir(exist_ok=True)
 
 params = SearchParams(query="space", sorting=Sort.TOPLIST)
 
-for wallpaper in client.iter_wallpapers(params):
+for wallpaper in client.iter_media(params):
     # Derive a filename from the wallpaper ID and file type
     ext = wallpaper.file_type.split("/")[-1]  # "image/jpeg" -> "jpeg"
     filename = output_dir / f"{wallpaper.id}.{ext}"
@@ -76,16 +76,16 @@ for wallpaper in client.iter_wallpapers(params):
 ```python
 import asyncio
 from pathlib import Path
-from xanax import AsyncXanax, SearchParams, Sort
+from xanax import AsyncWallhaven, SearchParams, Sort
 
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         output_dir = Path("wallpapers")
         output_dir.mkdir(exist_ok=True)
 
         params = SearchParams(query="nature", sorting=Sort.TOPLIST)
 
-        async for wallpaper in client.aiter_wallpapers(params):
+        async for wallpaper in client.aiter_media(params):
             ext = wallpaper.file_type.split("/")[-1]
             filename = output_dir / f"{wallpaper.id}.{ext}"
             await client.download(wallpaper, path=filename)

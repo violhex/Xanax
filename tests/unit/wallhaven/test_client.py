@@ -1,19 +1,21 @@
 """
-Tests for xanax client.
+Tests for Wallhaven sync client.
 """
 
 from unittest.mock import Mock, patch
 
 import pytest
 
-from xanax import Xanax
-from xanax.enums import Purity
 from xanax.errors import (
     AuthenticationError,
     NotFoundError,
     RateLimitError,
     ValidationError,
 )
+from xanax.sources.wallhaven import Wallhaven
+from xanax.sources.wallhaven.enums import Purity
+from xanax.sources.wallhaven.models import Wallpaper
+from xanax.sources.wallhaven.params import SearchParams
 
 # ---------------------------------------------------------------------------
 # Shared fixtures
@@ -81,27 +83,27 @@ def _make_response(status_code: int, json_data: dict | None = None) -> Mock:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxInit:
+class TestWallhavenInit:
     def test_default_init(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = Xanax()
+        client = Wallhaven()
         assert client.is_authenticated is False
 
     def test_with_api_key(self) -> None:
-        client = Xanax(api_key="test-key-123")
+        client = Wallhaven(api_key="test-key-123")
         assert client.is_authenticated is True
 
     def test_env_var_api_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("WALLHAVEN_API_KEY", "env-key")
-        client = Xanax()
+        client = Wallhaven()
         assert client.is_authenticated is True
 
     def test_repr(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = Xanax()
+        client = Wallhaven()
         assert "unauthenticated" in repr(client)
 
-        client_with_key = Xanax(api_key="test")
+        client_with_key = Wallhaven(api_key="test")
         assert "authenticated" in repr(client_with_key)
 
 
@@ -110,49 +112,49 @@ class TestXanaxInit:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxWallpaper:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenWallpaper:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_get_wallpaper_success(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client.request.return_value = _make_response(200, {"data": WALLPAPER_DATA})
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
         wallpaper = client.wallpaper("94x38z")
 
         assert wallpaper.id == "94x38z"
         assert wallpaper.resolution == "6742x3534"
 
-    @patch("xanax.client.httpx.Client")
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_get_wallpaper_not_found(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client.request.return_value = _make_response(404)
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
 
         with pytest.raises(NotFoundError):
             client.wallpaper("nonexistent")
 
-    @patch("xanax.client.httpx.Client")
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_get_wallpaper_rate_limited(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client.request.return_value = _make_response(429)
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
 
         with pytest.raises(RateLimitError):
             client.wallpaper("94x38z")
 
-    @patch("xanax.client.httpx.Client")
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_auth_header_sent_not_query_param(self, mock_client_cls: Mock) -> None:
         """API key must go in headers only, never as a query parameter."""
         mock_client = Mock()
         mock_client.request.return_value = _make_response(200, {"data": WALLPAPER_DATA})
         mock_client_cls.return_value = mock_client
 
-        client = Xanax(api_key="my-secret-key")
+        client = Wallhaven(api_key="my-secret-key")
         client.wallpaper("94x38z")
 
         call_kwargs = mock_client.request.call_args
@@ -168,16 +170,14 @@ class TestXanaxWallpaper:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxSearch:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenSearch:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_search_success(self, mock_client_cls: Mock) -> None:
-        from xanax.search import SearchParams
-
         mock_client = Mock()
         mock_client.request.return_value = _make_response(200, SEARCH_RESPONSE)
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
         params = SearchParams(query="anime")
         result = client.search(params)
 
@@ -186,10 +186,8 @@ class TestXanaxSearch:
         assert result.meta.total == 48
 
     def test_search_nsfw_without_key_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        from xanax.search import SearchParams
-
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = Xanax()
+        client = Wallhaven()
 
         with pytest.raises(AuthenticationError) as exc_info:
             client.search(SearchParams(purity=[Purity.NSFW]))
@@ -197,10 +195,9 @@ class TestXanaxSearch:
         assert "API key" in str(exc_info.value)
 
     def test_search_with_toplist_without_toplist_sorting_raises(self) -> None:
-        from xanax.enums import Sort, TopRange
-        from xanax.search import SearchParams
+        from xanax.sources.wallhaven.enums import Sort, TopRange
 
-        client = Xanax()
+        client = Wallhaven()
 
         with pytest.raises(ValidationError):
             client.search(SearchParams(sorting=Sort.DATE_ADDED, top_range=TopRange.ONE_MONTH))
@@ -211,8 +208,8 @@ class TestXanaxSearch:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxTag:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenTag:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_get_tag_success(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client.request.return_value = _make_response(
@@ -231,7 +228,7 @@ class TestXanaxTag:
         )
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
         tag = client.tag(1)
 
         assert tag.id == 1
@@ -243,8 +240,8 @@ class TestXanaxTag:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxCollections:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenCollections:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_get_collections_with_username(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client.request.return_value = _make_response(
@@ -263,7 +260,7 @@ class TestXanaxCollections:
         )
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
         collections = client.collections(username="testuser")
 
         assert len(collections) == 1
@@ -274,7 +271,7 @@ class TestXanaxCollections:
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = Xanax()
+        client = Wallhaven()
 
         with pytest.raises(AuthenticationError) as exc_info:
             client.collections()
@@ -287,11 +284,9 @@ class TestXanaxCollections:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxDownload:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenDownload:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_download_returns_bytes(self, mock_client_cls: Mock) -> None:
-        from xanax.models import Wallpaper
-
         mock_response = Mock()
         mock_response.content = b"fake-image-bytes"
         mock_response.raise_for_status = Mock()
@@ -301,20 +296,16 @@ class TestXanaxDownload:
         mock_client_cls.return_value = mock_client
 
         wallpaper = Wallpaper(**WALLPAPER_DATA)
-        client = Xanax()
+        client = Wallhaven()
         result = client.download(wallpaper)
 
         assert result == b"fake-image-bytes"
-        mock_client.get.assert_called_once_with(
-            wallpaper.path, follow_redirects=True
-        )
+        mock_client.get.assert_called_once_with(wallpaper.path, follow_redirects=True)
 
-    @patch("xanax.client.httpx.Client")
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_download_saves_to_path(
         self, mock_client_cls: Mock, tmp_path: pytest.TempPathFactory
     ) -> None:
-        from xanax.models import Wallpaper
-
         mock_response = Mock()
         mock_response.content = b"fake-image-bytes"
         mock_response.raise_for_status = Mock()
@@ -325,7 +316,7 @@ class TestXanaxDownload:
 
         wallpaper = Wallpaper(**WALLPAPER_DATA)
         dest = tmp_path / "wallpaper.jpg"  # type: ignore[operator]
-        client = Xanax()
+        client = Wallhaven()
         result = client.download(wallpaper, path=dest)
 
         assert result == b"fake-image-bytes"
@@ -333,15 +324,13 @@ class TestXanaxDownload:
 
 
 # ---------------------------------------------------------------------------
-# iter_pages / iter_wallpapers
+# iter_pages / iter_media
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxIterPages:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenIterPages:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_iter_pages_single_page(self, mock_client_cls: Mock) -> None:
-        from xanax.search import SearchParams
-
         single_page_response = {
             "data": [WALLPAPER_DATA],
             "meta": {
@@ -356,16 +345,14 @@ class TestXanaxIterPages:
         mock_client.request.return_value = _make_response(200, single_page_response)
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
         pages = list(client.iter_pages(SearchParams(query="anime")))
 
         assert len(pages) == 1
         assert len(pages[0].data) == 1
 
-    @patch("xanax.client.httpx.Client")
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_iter_pages_multiple_pages(self, mock_client_cls: Mock) -> None:
-        from xanax.search import SearchParams
-
         mock_client = Mock()
         mock_client.request.side_effect = [
             _make_response(200, SEARCH_RESPONSE),
@@ -373,7 +360,7 @@ class TestXanaxIterPages:
         ]
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
+        client = Wallhaven()
         pages = list(client.iter_pages(SearchParams(query="anime")))
 
         assert len(pages) == 2
@@ -381,11 +368,9 @@ class TestXanaxIterPages:
         assert pages[1].meta.current_page == 2
 
 
-class TestXanaxIterWallpapers:
-    @patch("xanax.client.httpx.Client")
-    def test_iter_wallpapers_flattens_pages(self, mock_client_cls: Mock) -> None:
-        from xanax.search import SearchParams
-
+class TestWallhavenIterMedia:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
+    def test_iter_media_flattens_pages(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client.request.side_effect = [
             _make_response(200, SEARCH_RESPONSE),
@@ -393,8 +378,8 @@ class TestXanaxIterWallpapers:
         ]
         mock_client_cls.return_value = mock_client
 
-        client = Xanax()
-        wallpapers = list(client.iter_wallpapers(SearchParams(query="anime")))
+        client = Wallhaven()
+        wallpapers = list(client.iter_media(SearchParams(query="anime")))
 
         assert len(wallpapers) == 2
         assert all(wp.id == "94x38z" for wp in wallpapers)
@@ -405,13 +390,13 @@ class TestXanaxIterWallpapers:
 # ---------------------------------------------------------------------------
 
 
-class TestXanaxContextManager:
-    @patch("xanax.client.httpx.Client")
+class TestWallhavenContextManager:
+    @patch("xanax.sources.wallhaven.client.httpx.Client")
     def test_context_manager(self, mock_client_cls: Mock) -> None:
         mock_client = Mock()
         mock_client_cls.return_value = mock_client
 
-        with Xanax():
+        with Wallhaven():
             pass
 
         mock_client.close.assert_called_once()

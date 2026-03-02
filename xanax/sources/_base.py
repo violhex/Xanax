@@ -1,15 +1,15 @@
 """
-Base protocols for xanax wallpaper sources.
+Base protocols for all xanax media sources.
 
 Every source client — Wallhaven, Unsplash, Reddit, etc. — satisfies
 these protocols. This allows duck-typed multi-source code without
 requiring inheritance.
 
 Example:
-    from xanax.sources._base import WallpaperSource
+    from xanax.sources._base import MediaSource
 
-    def download_all(source: WallpaperSource, params: Any) -> list[bytes]:
-        return [source.download(wp) for wp in source.iter_wallpapers(params)]
+    def download_all(source: MediaSource, params: Any) -> list[bytes]:
+        return [source.download(item) for item in source.iter_media(params)]
 """
 
 from collections.abc import AsyncIterator, Iterator
@@ -18,71 +18,71 @@ from typing import Any, Protocol, runtime_checkable
 
 
 @runtime_checkable
-class WallpaperSource(Protocol):
+class MediaSource(Protocol):
     """
-    Protocol satisfied by all synchronous wallpaper source clients.
+    Protocol satisfied by all synchronous media source clients.
 
-    Any object implementing ``download`` and ``iter_wallpapers`` satisfies
+    Any object implementing ``download`` and ``iter_media`` satisfies
     this protocol, enabling interchangeable multi-source code without
     coupling to a specific client class.
     """
 
-    def download(self, wallpaper: Any, path: str | Path | None = None) -> bytes:
+    def download(self, media: Any, path: str | Path | None = None) -> bytes:
         """
-        Download raw image bytes for the given wallpaper.
+        Download raw bytes for the given media item.
 
         Args:
-            wallpaper: Source-specific wallpaper object.
-            path: Optional path to write the image to disk.
+            media: Source-specific media object.
+            path: Optional path to write the file to disk.
 
         Returns:
-            Raw image bytes.
+            Raw bytes.
         """
         ...
 
-    def iter_wallpapers(self, params: Any) -> Iterator[Any]:
+    def iter_media(self, params: Any) -> Iterator[Any]:
         """
-        Iterate over wallpapers matching the given parameters.
+        Iterate over media items matching the given parameters.
 
         Args:
             params: Source-specific search/filter parameters.
 
         Yields:
-            Source-specific wallpaper objects.
+            Source-specific media objects.
         """
         ...
 
 
 @runtime_checkable
-class AsyncWallpaperSource(Protocol):
+class AsyncMediaSource(Protocol):
     """
-    Protocol satisfied by all asynchronous wallpaper source clients.
+    Protocol satisfied by all asynchronous media source clients.
 
-    The async counterpart to :class:`WallpaperSource`. Implement
-    ``download`` and ``aiter_wallpapers`` to satisfy this protocol.
+    The async counterpart to :class:`MediaSource`. Implement
+    ``download`` and ``aiter_media`` to satisfy this protocol.
     """
 
-    async def download(self, wallpaper: Any, path: str | Path | None = None) -> bytes:
+    async def download(self, media: Any, path: str | Path | None = None) -> bytes:
         """
-        Download raw image bytes for the given wallpaper.
+        Download raw bytes for the given media item.
 
         Args:
-            wallpaper: Source-specific wallpaper object.
-            path: Optional path to write the image to disk.
+            media: Source-specific media object.
+            path: Optional path to write the file to disk.
 
         Returns:
-            Raw image bytes.
+            Raw bytes.
         """
         ...
 
-    async def aiter_wallpapers(self, params: Any) -> AsyncIterator[Any]:
+    async def aiter_media(self, params: Any) -> AsyncIterator[Any]:
         """
-        Async-iterate over wallpapers matching the given parameters.
+        Async-iterate over media items matching the given parameters.
 
         Args:
             params: Source-specific search/filter parameters.
 
         Yields:
-            Source-specific wallpaper objects.
+            Source-specific media objects.
         """
         ...

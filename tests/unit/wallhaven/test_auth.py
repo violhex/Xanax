@@ -1,11 +1,10 @@
 """
-Tests for xanax authentication handler.
+Tests for Wallhaven authentication handler.
 """
-
 
 import pytest
 
-from xanax.auth import AuthHandler
+from xanax.sources.wallhaven.auth import AuthHandler
 
 
 class TestAuthHandler:

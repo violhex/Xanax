@@ -68,7 +68,7 @@ class Tag(BaseModel):
 
 
 class Wallpaper(BaseModel):
-    """Single wallpaper information."""
+    """Single wallpaper from Wallhaven."""
 
     id: str
     url: str
@@ -100,7 +100,7 @@ class QueryInfo(BaseModel):
 
 
 class PaginationMeta(BaseModel):
-    """Pagination metadata for search results."""
+    """Pagination metadata for Wallhaven search results."""
 
     current_page: int
     last_page: int
@@ -142,7 +142,7 @@ class Collection(BaseModel):
 
 
 class CollectionListing(BaseModel):
-    """Collection listing response (similar to search results)."""
+    """Collection listing response (mirrors SearchResult structure)."""
 
     data: list[Wallpaper]
     meta: PaginationMeta

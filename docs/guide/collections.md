@@ -5,9 +5,9 @@ Wallhaven lets users organize wallpapers into named collections. xanax exposes t
 ## List a user's collections
 
 ```python
-from xanax import Xanax
+from xanax import Wallhaven
 
-client = Xanax()
+client = Wallhaven()
 
 # Public collections for any user (no API key needed)
 collections = client.collections(username="someuser")
@@ -20,7 +20,7 @@ for col in collections:
 Without a username, the API returns the authenticated user's own collections:
 
 ```python
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 collections = client.collections()
 ```
 
@@ -55,10 +55,10 @@ collection.count    # int — number of wallpapers
 
 ```python
 import asyncio
-from xanax import AsyncXanax
+from xanax import AsyncWallhaven
 
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         collections = await client.collections(username="someuser")
         listing = await client.collection("someuser", collections[0].id)
 

@@ -1,7 +1,7 @@
 [project]
 name = "xanax"
-version = "0.2.1"
-description = "A clean, type-safe Python client for wallpaper APIs (Wallhaven, Unsplash)"
+version = "0.3.0"
+description = "A clean, type-safe Python client for multi-source media APIs (Wallhaven, Unsplash, Reddit)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "BSD-3-Clause" }
@@ -34,9 +34,10 @@ dev = [
     "mypy>=1.8.0",
 ]
 docs = [
-    "mkdocs>=1.6",
-    "mkdocs-material>=9.5",
-    "mkdocstrings[python]>=0.27",
+    "sphinx>=7.0",
+    "furo>=2024.1.29",
+    "myst-parser>=3.0",
+    "sphinx-autodoc-typehints>=2.0",
 ]
 
 [build-system]

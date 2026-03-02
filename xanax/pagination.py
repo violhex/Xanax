@@ -1,19 +1,19 @@
 """
-Pagination utilities for search results.
+Pagination utilities for Wallhaven search results.
 
 Provides helpers for navigating through paginated results
 and working with pagination metadata.
 """
 
-from xanax.models import PaginationMeta
+from xanax.sources.wallhaven.models import PaginationMeta
 
 
 class PaginationHelper:
     """
-    Helper class for navigating paginated search results.
+    Helper class for navigating paginated Wallhaven search results.
 
-    Wraps :class:`~xanax.models.PaginationMeta` and exposes clean properties
-    and methods for driving pagination loops.
+    Wraps :class:`~xanax.sources.wallhaven.models.PaginationMeta` and exposes
+    clean properties and methods for driving pagination loops.
 
     Example:
         results = client.search(params)
@@ -49,12 +49,12 @@ class PaginationHelper:
 
     @property
     def has_next(self) -> bool:
-        """Check if there is a next page available."""
+        """Return True if there is a next page available."""
         return self._meta.current_page < self._meta.last_page
 
     @property
     def has_previous(self) -> bool:
-        """Check if there is a previous page."""
+        """Return True if there is a previous page."""
         return self._meta.current_page > 1
 
     @property

@@ -6,8 +6,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from xanax._internal.rate_limit import RateLimitHandler, check_rate_limit
 from xanax.errors import RateLimitError
-from xanax.rate_limit import RateLimitHandler, check_rate_limit
 
 
 class TestRateLimitHandler:

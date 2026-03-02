@@ -301,9 +301,7 @@ class TestUnsplashRandom:
 
 class TestUnsplashDownload:
     @patch("xanax.sources.unsplash.client.httpx.Client")
-    def test_download_triggers_tracking_then_fetches_cdn(
-        self, mock_client_cls: Mock
-    ) -> None:
+    def test_download_triggers_tracking_then_fetches_cdn(self, mock_client_cls: Mock) -> None:
         """download() must call download_location first, then fetch the CDN URL."""
         tracking_response = Mock()
         tracking_response.json.return_value = {"url": "https://cdn.example.com/photo.jpg"}
@@ -380,7 +378,7 @@ class TestUnsplashDownload:
 
 
 # ---------------------------------------------------------------------------
-# iter_pages() / iter_wallpapers()
+# iter_pages() / iter_media()
 # ---------------------------------------------------------------------------
 
 
@@ -429,9 +427,9 @@ class TestUnsplashIterPages:
         assert mock_client.request.call_count == 1
 
 
-class TestUnsplashIterWallpapers:
+class TestUnsplashIterMedia:
     @patch("xanax.sources.unsplash.client.httpx.Client")
-    def test_iter_wallpapers_flattens_pages(self, mock_client_cls: Mock) -> None:
+    def test_iter_media_flattens_pages(self, mock_client_cls: Mock) -> None:
         page1 = {"total": 20, "total_pages": 2, "results": [PHOTO_DATA]}
         page2 = {"total": 20, "total_pages": 2, "results": [PHOTO_DATA]}
 
@@ -443,7 +441,7 @@ class TestUnsplashIterWallpapers:
         mock_client_cls.return_value = mock_client
 
         client = Unsplash(access_key="key")
-        photos = list(client.iter_wallpapers(UnsplashSearchParams(query="x")))
+        photos = list(client.iter_media(UnsplashSearchParams(query="x")))
 
         assert len(photos) == 2
         assert all(p.id == "abc123" for p in photos)

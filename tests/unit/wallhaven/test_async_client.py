@@ -1,23 +1,24 @@
 """
-Tests for AsyncXanax client.
+Tests for AsyncWallhaven client.
 """
 
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from xanax import AsyncXanax
-from xanax.enums import Purity
 from xanax.errors import (
     AuthenticationError,
     NotFoundError,
     RateLimitError,
     ValidationError,
 )
-from xanax.search import SearchParams
+from xanax.sources.wallhaven import AsyncWallhaven
+from xanax.sources.wallhaven.enums import Purity
+from xanax.sources.wallhaven.models import Wallpaper
+from xanax.sources.wallhaven.params import SearchParams
 
 # ---------------------------------------------------------------------------
-# Shared test data (mirrors test_client.py)
+# Shared test data
 # ---------------------------------------------------------------------------
 
 WALLPAPER_DATA = {
@@ -82,28 +83,28 @@ def _make_response(status_code: int, json_data: dict | None = None) -> Mock:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxInit:
+class TestAsyncWallhavenInit:
     def test_default_init(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         assert client.is_authenticated is False
 
     def test_with_api_key(self) -> None:
-        client = AsyncXanax(api_key="test-key-123")
+        client = AsyncWallhaven(api_key="test-key-123")
         assert client.is_authenticated is True
 
     def test_env_var_api_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("WALLHAVEN_API_KEY", "env-key")
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         assert client.is_authenticated is True
 
     def test_repr_unauthenticated(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         assert "unauthenticated" in repr(client)
 
     def test_repr_authenticated(self) -> None:
-        client = AsyncXanax(api_key="key")
+        client = AsyncWallhaven(api_key="key")
         assert "authenticated" in repr(client)
 
 
@@ -112,52 +113,48 @@ class TestAsyncXanaxInit:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxWallpaper:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenWallpaper:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_get_wallpaper_success(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
-        mock_client.request = AsyncMock(
-            return_value=_make_response(200, {"data": WALLPAPER_DATA})
-        )
+        mock_client.request = AsyncMock(return_value=_make_response(200, {"data": WALLPAPER_DATA}))
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         wallpaper = await client.wallpaper("94x38z")
 
         assert wallpaper.id == "94x38z"
         assert wallpaper.resolution == "6742x3534"
 
-    @patch("xanax.async_client.httpx.AsyncClient")
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_get_wallpaper_not_found(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(return_value=_make_response(404))
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
 
         with pytest.raises(NotFoundError):
             await client.wallpaper("nonexistent")
 
-    @patch("xanax.async_client.httpx.AsyncClient")
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_get_wallpaper_rate_limited(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(return_value=_make_response(429))
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
 
         with pytest.raises(RateLimitError):
             await client.wallpaper("94x38z")
 
-    @patch("xanax.async_client.httpx.AsyncClient")
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_auth_header_sent_not_query_param(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
-        mock_client.request = AsyncMock(
-            return_value=_make_response(200, {"data": WALLPAPER_DATA})
-        )
+        mock_client.request = AsyncMock(return_value=_make_response(200, {"data": WALLPAPER_DATA}))
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax(api_key="my-secret-key")
+        client = AsyncWallhaven(api_key="my-secret-key")
         await client.wallpaper("94x38z")
 
         call_kwargs = mock_client.request.call_args
@@ -173,37 +170,33 @@ class TestAsyncXanaxWallpaper:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxSearch:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenSearch:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_search_success(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(return_value=_make_response(200, SEARCH_RESPONSE))
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         result = await client.search(SearchParams(query="anime"))
 
         assert len(result.data) == 1
         assert result.meta.total == 48
 
-    async def test_search_nsfw_without_key_raises(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_search_nsfw_without_key_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = AsyncXanax()
+        client = AsyncWallhaven()
 
         with pytest.raises(AuthenticationError):
             await client.search(SearchParams(purity=[Purity.NSFW]))
 
     async def test_search_toplist_validates(self) -> None:
-        from xanax.enums import Sort, TopRange
+        from xanax.sources.wallhaven.enums import Sort, TopRange
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
 
         with pytest.raises(ValidationError):
-            await client.search(
-                SearchParams(sorting=Sort.DATE_ADDED, top_range=TopRange.ONE_MONTH)
-            )
+            await client.search(SearchParams(sorting=Sort.DATE_ADDED, top_range=TopRange.ONE_MONTH))
 
 
 # ---------------------------------------------------------------------------
@@ -211,8 +204,8 @@ class TestAsyncXanaxSearch:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxTag:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenTag:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_get_tag_success(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(
@@ -233,7 +226,7 @@ class TestAsyncXanaxTag:
         )
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         tag = await client.tag(1)
 
         assert tag.id == 1
@@ -245,12 +238,10 @@ class TestAsyncXanaxTag:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxSettings:
-    async def test_settings_without_key_raises(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+class TestAsyncWallhavenSettings:
+    async def test_settings_without_key_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = AsyncXanax()
+        client = AsyncWallhaven()
 
         with pytest.raises(AuthenticationError):
             await client.settings()
@@ -261,8 +252,8 @@ class TestAsyncXanaxSettings:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxCollections:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenCollections:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_get_collections_with_username(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(
@@ -283,18 +274,16 @@ class TestAsyncXanaxCollections:
         )
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         collections = await client.collections(username="testuser")
 
         assert len(collections) == 1
         assert collections[0].label == "Default"
         assert collections[0].public is True
 
-    async def test_get_own_collections_no_key_raises(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_get_own_collections_no_key_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("WALLHAVEN_API_KEY", raising=False)
-        client = AsyncXanax()
+        client = AsyncWallhaven()
 
         with pytest.raises(AuthenticationError):
             await client.collections()
@@ -305,11 +294,9 @@ class TestAsyncXanaxCollections:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxDownload:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenDownload:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_download_returns_bytes(self, mock_client_cls: Mock) -> None:
-        from xanax.models import Wallpaper
-
         mock_dl_response = Mock()
         mock_dl_response.content = b"fake-image-bytes"
         mock_dl_response.raise_for_status = Mock()
@@ -319,18 +306,16 @@ class TestAsyncXanaxDownload:
         mock_client_cls.return_value = mock_client
 
         wallpaper = Wallpaper(**WALLPAPER_DATA)
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         result = await client.download(wallpaper)
 
         assert result == b"fake-image-bytes"
         mock_client.get.assert_called_once_with(wallpaper.path, follow_redirects=True)
 
-    @patch("xanax.async_client.httpx.AsyncClient")
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_download_saves_to_path(
         self, mock_client_cls: Mock, tmp_path: pytest.TempPathFactory
     ) -> None:
-        from xanax.models import Wallpaper
-
         mock_dl_response = Mock()
         mock_dl_response.content = b"fake-image-bytes"
         mock_dl_response.raise_for_status = Mock()
@@ -341,7 +326,7 @@ class TestAsyncXanaxDownload:
 
         wallpaper = Wallpaper(**WALLPAPER_DATA)
         dest = tmp_path / "wallpaper.jpg"  # type: ignore[operator]
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         result = await client.download(wallpaper, path=dest)
 
         assert result == b"fake-image-bytes"
@@ -349,12 +334,12 @@ class TestAsyncXanaxDownload:
 
 
 # ---------------------------------------------------------------------------
-# aiter_pages / aiter_wallpapers
+# aiter_pages / aiter_media
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxIterPages:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenIterPages:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_aiter_pages_single_page(self, mock_client_cls: Mock) -> None:
         single_page = {
             "data": [WALLPAPER_DATA],
@@ -365,12 +350,12 @@ class TestAsyncXanaxIterPages:
         mock_client.request = AsyncMock(return_value=_make_response(200, single_page))
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         pages = [page async for page in client.aiter_pages(SearchParams(query="anime"))]
 
         assert len(pages) == 1
 
-    @patch("xanax.async_client.httpx.AsyncClient")
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_aiter_pages_multiple_pages(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(
@@ -381,7 +366,7 @@ class TestAsyncXanaxIterPages:
         )
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
+        client = AsyncWallhaven()
         pages = [page async for page in client.aiter_pages(SearchParams(query="anime"))]
 
         assert len(pages) == 2
@@ -389,9 +374,9 @@ class TestAsyncXanaxIterPages:
         assert pages[1].meta.current_page == 2
 
 
-class TestAsyncXanaxIterWallpapers:
-    @patch("xanax.async_client.httpx.AsyncClient")
-    async def test_aiter_wallpapers_flattens_pages(self, mock_client_cls: Mock) -> None:
+class TestAsyncWallhavenIterMedia:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
+    async def test_aiter_media_flattens_pages(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client.request = AsyncMock(
             side_effect=[
@@ -401,10 +386,8 @@ class TestAsyncXanaxIterWallpapers:
         )
         mock_client_cls.return_value = mock_client
 
-        client = AsyncXanax()
-        wallpapers = [
-            wp async for wp in client.aiter_wallpapers(SearchParams(query="anime"))
-        ]
+        client = AsyncWallhaven()
+        wallpapers = [wp async for wp in client.aiter_media(SearchParams(query="anime"))]
 
         assert len(wallpapers) == 2
         assert all(wp.id == "94x38z" for wp in wallpapers)
@@ -415,13 +398,13 @@ class TestAsyncXanaxIterWallpapers:
 # ---------------------------------------------------------------------------
 
 
-class TestAsyncXanaxContextManager:
-    @patch("xanax.async_client.httpx.AsyncClient")
+class TestAsyncWallhavenContextManager:
+    @patch("xanax.sources.wallhaven.async_client.httpx.AsyncClient")
     async def test_async_context_manager(self, mock_client_cls: Mock) -> None:
         mock_client = AsyncMock()
         mock_client_cls.return_value = mock_client
 
-        async with AsyncXanax() as client:
+        async with AsyncWallhaven() as client:
             assert client is not None
 
         mock_client.aclose.assert_called_once()

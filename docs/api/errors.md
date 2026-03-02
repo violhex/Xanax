@@ -1,13 +1,31 @@
 # Errors
 
-::: xanax.errors.XanaxError
+```{eval-rst}
+.. autoclass:: xanax.errors.XanaxError
+   :members:
+```
 
-::: xanax.errors.AuthenticationError
+```{eval-rst}
+.. autoclass:: xanax.errors.AuthenticationError
+   :members:
+```
 
-::: xanax.errors.RateLimitError
+```{eval-rst}
+.. autoclass:: xanax.errors.RateLimitError
+   :members:
+```
 
-::: xanax.errors.NotFoundError
+```{eval-rst}
+.. autoclass:: xanax.errors.NotFoundError
+   :members:
+```
 
-::: xanax.errors.ValidationError
+```{eval-rst}
+.. autoclass:: xanax.errors.ValidationError
+   :members:
+```
 
-::: xanax.errors.APIError
+```{eval-rst}
+.. autoclass:: xanax.errors.APIError
+   :members:
+```

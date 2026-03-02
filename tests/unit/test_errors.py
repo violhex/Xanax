@@ -2,7 +2,6 @@
 Tests for xanax error classes.
 """
 
-
 from xanax.errors import (
     APIError,
     AuthenticationError,

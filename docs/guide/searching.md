@@ -5,9 +5,9 @@ All searches go through `SearchParams`. It's a Pydantic model, so invalid combin
 ## Basic search
 
 ```python
-from xanax import Xanax, SearchParams
+from xanax import Wallhaven, SearchParams
 
-client = Xanax()
+client = Wallhaven()
 results = client.search(SearchParams(query="anime"))
 ```
 
@@ -68,9 +68,9 @@ SearchParams(purity=[Purity.SFW, Purity.SKETCHY])
 SearchParams(purity=[Purity.NSFW])
 ```
 
-!!! note
-    Requesting NSFW without an API key raises `AuthenticationError` immediately, before the request is sent.
-
+:::{note}
+Requesting NSFW without an API key raises `AuthenticationError` immediately, before the request is sent.
+:::
 ## Sorting
 
 ```python
@@ -197,10 +197,10 @@ Both return a new `SearchParams` with the single field updated and everything el
 ## Full example
 
 ```python
-from xanax import Xanax, SearchParams
+from xanax import Wallhaven, SearchParams
 from xanax.enums import Category, Color, FileType, Order, Purity, Sort, TopRange
 
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 
 params = SearchParams(
     query="+nature -water",

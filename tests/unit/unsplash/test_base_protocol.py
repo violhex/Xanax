@@ -1,36 +1,36 @@
 """
-Tests for the WallpaperSource protocol and sources package.
+Tests for the MediaSource protocol and sources package.
 """
 
 from xanax.sources import AsyncUnsplash, Unsplash
-from xanax.sources._base import AsyncWallpaperSource, WallpaperSource
+from xanax.sources._base import AsyncMediaSource, MediaSource
 
 
-class TestWallpaperSourceProtocol:
-    def test_unsplash_satisfies_wallpaper_source(self) -> None:
-        """Unsplash must satisfy the WallpaperSource protocol."""
+class TestMediaSourceProtocol:
+    def test_unsplash_satisfies_media_source(self) -> None:
+        """Unsplash must satisfy the MediaSource protocol."""
         client = Unsplash(access_key="test-key")
-        assert isinstance(client, WallpaperSource)
+        assert isinstance(client, MediaSource)
 
-    def test_async_unsplash_satisfies_async_wallpaper_source(self) -> None:
-        """AsyncUnsplash must satisfy the AsyncWallpaperSource protocol."""
+    def test_async_unsplash_satisfies_async_media_source(self) -> None:
+        """AsyncUnsplash must satisfy the AsyncMediaSource protocol."""
         client = AsyncUnsplash(access_key="test-key")
-        assert isinstance(client, AsyncWallpaperSource)
+        assert isinstance(client, AsyncMediaSource)
 
     def test_arbitrary_object_does_not_satisfy_protocol(self) -> None:
         class NotASource:
             pass
 
-        assert not isinstance(NotASource(), WallpaperSource)
+        assert not isinstance(NotASource(), MediaSource)
 
     def test_partial_implementation_does_not_satisfy_protocol(self) -> None:
         class PartialSource:
-            def download(self, wallpaper, path=None):  # type: ignore[no-untyped-def]
+            def download(self, media, path=None):  # type: ignore[no-untyped-def]
                 return b""
 
-            # missing iter_wallpapers
+            # missing iter_media
 
-        assert not isinstance(PartialSource(), WallpaperSource)
+        assert not isinstance(PartialSource(), MediaSource)
 
 
 class TestSourcesPackageExports:

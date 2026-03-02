@@ -1,15 +1,15 @@
 # Async Client
 
-`AsyncXanax` is a complete async counterpart to `Xanax`. Every method is `async def`, it uses `httpx.AsyncClient` internally, and it supports async context managers and async generators.
+`AsyncWallhaven` is a complete async counterpart to `Wallhaven`. Every method is `async def`, it uses `httpx.AsyncClient` internally, and it supports async context managers and async generators.
 
 ## Basic usage
 
 ```python
 import asyncio
-from xanax import AsyncXanax, SearchParams
+from xanax import AsyncWallhaven, SearchParams
 
 async def main():
-    client = AsyncXanax(api_key="your-api-key")
+    client = AsyncWallhaven(api_key="your-api-key")
 
     results = await client.search(SearchParams(query="anime"))
     for wallpaper in results.data:
@@ -26,7 +26,7 @@ The context manager handles cleanup automatically:
 
 ```python
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         results = await client.search(SearchParams(query="nature"))
         wallpaper = await client.wallpaper("94x38z")
 ```
@@ -35,9 +35,9 @@ async def main():
 
 ```python
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         # Flat iteration over all wallpapers
-        async for wallpaper in client.aiter_wallpapers(SearchParams(query="space")):
+        async for wallpaper in client.aiter_media(SearchParams(query="space")):
             print(wallpaper.id, wallpaper.path)
 
         # Page-by-page
@@ -47,7 +47,7 @@ async def main():
 
 ## Available methods
 
-All sync `Xanax` methods have async equivalents:
+All sync `Wallhaven` methods have async equivalents:
 
 | Sync | Async |
 | ---- | ----- |
@@ -59,38 +59,38 @@ All sync `Xanax` methods have async equivalents:
 | `collection(username, id)` | `await client.collection(username, id)` |
 | `download(wallpaper, path?)` | `await client.download(wallpaper, path?)` |
 | `iter_pages(params)` | `client.aiter_pages(params)` (async generator) |
-| `iter_wallpapers(params)` | `client.aiter_wallpapers(params)` (async generator) |
+| `iter_media(params)` | `client.aiter_media(params)` (async generator) |
 
 ## Rate limit retry
 
 Retry with exponential backoff uses `asyncio.sleep()`, so it never blocks the event loop:
 
 ```python
-client = AsyncXanax(api_key="your-api-key", max_retries=3)
+client = AsyncWallhaven(api_key="your-api-key", max_retries=3)
 ```
 
 ## Authentication and environment variables
 
-`AsyncXanax` reads `WALLHAVEN_API_KEY` from the environment the same way `Xanax` does:
+`AsyncWallhaven` reads `WALLHAVEN_API_KEY` from the environment the same way `Wallhaven` does:
 
 ```python
 import os
 os.environ["WALLHAVEN_API_KEY"] = "your-api-key"
 
-async with AsyncXanax() as client:  # key picked up automatically
+async with AsyncWallhaven() as client:  # key picked up automatically
     ...
 ```
 
 ## Concurrent requests
 
-Because `AsyncXanax` is fully async, you can use `asyncio.gather()` or `asyncio.TaskGroup` to run requests concurrently:
+Because `AsyncWallhaven` is fully async, you can use `asyncio.gather()` or `asyncio.TaskGroup` to run requests concurrently:
 
 ```python
 import asyncio
-from xanax import AsyncXanax
+from xanax import AsyncWallhaven
 
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         wp1, wp2, wp3 = await asyncio.gather(
             client.wallpaper("94x38z"),
             client.wallpaper("3l3mpl"),
@@ -103,19 +103,19 @@ asyncio.run(main())
 
 ## Integration with web frameworks
 
-`AsyncXanax` works naturally with async web frameworks like FastAPI:
+`AsyncWallhaven` works naturally with async web frameworks like FastAPI:
 
 ```python
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from xanax import AsyncXanax, SearchParams
+from xanax import AsyncWallhaven, SearchParams
 
-client: AsyncXanax
+client: AsyncWallhaven
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global client
-    client = AsyncXanax(api_key="your-api-key")
+    client = AsyncWallhaven(api_key="your-api-key")
     yield
     await client.aclose()
 

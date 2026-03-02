@@ -4,52 +4,110 @@ All API responses are parsed into typed Pydantic models. Fields are accessible a
 
 ## Wallhaven models
 
-::: xanax.models.Wallpaper
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.Wallpaper
+   :members:
+```
 
-::: xanax.models.SearchResult
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.SearchResult
+   :members:
+```
 
-::: xanax.models.PaginationMeta
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.PaginationMeta
+   :members:
+```
 
-::: xanax.models.Tag
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.Tag
+   :members:
+```
 
-::: xanax.models.Uploader
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.Uploader
+   :members:
+```
 
-::: xanax.models.Avatar
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.Avatar
+   :members:
+```
 
-::: xanax.models.Thumbnails
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.Thumbnails
+   :members:
+```
 
-::: xanax.models.QueryInfo
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.QueryInfo
+   :members:
+```
 
-::: xanax.models.UserSettings
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.UserSettings
+   :members:
+```
 
-::: xanax.models.Collection
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.Collection
+   :members:
+```
 
-::: xanax.models.CollectionListing
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.models.CollectionListing
+   :members:
+```
 
-::: xanax.pagination.PaginationHelper
+```{eval-rst}
+.. autoclass:: xanax.pagination.PaginationHelper
+   :members:
+```
 
 ---
 
 ## Unsplash models
 
-::: xanax.sources.unsplash.models.UnsplashPhoto
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.models.UnsplashPhoto
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashSearchResult
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.models.UnsplashSearchResult
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashPhotoUrls
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.models.UnsplashPhotoUrls
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashPhotoLinks
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.models.UnsplashPhotoLinks
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashUser
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.models.UnsplashUser
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashUserProfileImage
+---
 
-::: xanax.sources.unsplash.models.UnsplashUserLinks
+## Reddit models
 
-::: xanax.sources.unsplash.models.UnsplashExif
+```{eval-rst}
+.. autoclass:: xanax.sources.reddit.models.RedditPost
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashLocation
+```{eval-rst}
+.. autoclass:: xanax.sources.reddit.models.RedditGalleryItem
+   :members:
+```
 
-::: xanax.sources.unsplash.models.UnsplashPosition
-
-::: xanax.sources.unsplash.models.UnsplashTag
+```{eval-rst}
+.. autoclass:: xanax.sources.reddit.models.RedditListing
+   :members:
+```

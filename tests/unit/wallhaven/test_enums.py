@@ -1,10 +1,20 @@
 """
-Tests for xanax enums.
+Tests for Wallhaven enums.
 """
 
 import pytest
 
-from xanax.enums import Category, Color, Order, Purity, Ratio, Resolution, Seed, Sort, TopRange
+from xanax.sources.wallhaven.enums import (
+    Category,
+    Color,
+    Order,
+    Purity,
+    Ratio,
+    Resolution,
+    Seed,
+    Sort,
+    TopRange,
+)
 
 
 class TestCategory:

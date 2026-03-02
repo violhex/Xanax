@@ -2,16 +2,16 @@
 
 The Wallhaven API paginates search results — by default you get 24 wallpapers per page. xanax gives you a few different ways to handle this.
 
-## Auto-pagination with iter_wallpapers
+## Auto-pagination with iter_media
 
 The simplest option. This walks every page and yields wallpapers one at a time:
 
 ```python
-from xanax import Xanax, SearchParams
+from xanax import Wallhaven, SearchParams
 
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 
-for wallpaper in client.iter_wallpapers(SearchParams(query="space")):
+for wallpaper in client.iter_media(SearchParams(query="space")):
     print(wallpaper.id, wallpaper.path)
 ```
 
@@ -50,9 +50,9 @@ if result.meta.current_page < result.meta.last_page:
 `PaginationHelper` provides a structured way to inspect and navigate pagination metadata:
 
 ```python
-from xanax import Xanax, PaginationHelper, SearchParams
+from xanax import Wallhaven, PaginationHelper, SearchParams
 
-client = Xanax()
+client = Wallhaven()
 result = client.search(SearchParams(query="anime"))
 
 helper = PaginationHelper(result.meta)
@@ -86,20 +86,20 @@ if result.meta.seed:
     page2 = client.search(params.with_page(2))
 ```
 
-`iter_pages()` and `iter_wallpapers()` handle seed propagation automatically. You don't need to do anything.
+`iter_pages()` and `iter_media()` handle seed propagation automatically. You don't need to do anything.
 
 ## Async auto-pagination
 
-`AsyncXanax` has async equivalents:
+`AsyncWallhaven` has async equivalents:
 
 ```python
 import asyncio
-from xanax import AsyncXanax, SearchParams
+from xanax import AsyncWallhaven, SearchParams
 
 async def main():
-    async with AsyncXanax(api_key="your-api-key") as client:
+    async with AsyncWallhaven(api_key="your-api-key") as client:
         # Flat wallpaper iteration
-        async for wallpaper in client.aiter_wallpapers(SearchParams(query="space")):
+        async for wallpaper in client.aiter_media(SearchParams(query="space")):
             print(wallpaper.path)
 
         # Page-by-page
@@ -115,7 +115,7 @@ Both sync and async generators support early exit cleanly:
 
 ```python
 count = 0
-for wallpaper in client.iter_wallpapers(SearchParams(query="anime")):
+for wallpaper in client.iter_media(SearchParams(query="anime")):
     print(wallpaper.id)
     count += 1
     if count >= 100:

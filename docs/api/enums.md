@@ -1,6 +1,6 @@
 # Enumerations
 
-All search parameter options are expressed as `StrEnum` members, so they have both type safety and string compatibility. Every enum member can be compared to its string value directly.
+All search parameter options are expressed as `StrEnum` members, providing both type safety and string compatibility.
 
 ```python
 from xanax.enums import Sort
@@ -8,30 +8,81 @@ from xanax.enums import Sort
 Sort.TOPLIST == "toplist"  # True
 ```
 
+## Shared enumerations
+
+```{eval-rst}
+.. autoclass:: xanax._internal.media_type.MediaType
+   :members:
+```
+
+---
+
 ## Wallhaven enumerations
 
-::: xanax.enums.Category
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.enums.Category
+   :members:
+```
 
-::: xanax.enums.Purity
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.enums.Purity
+   :members:
+```
 
-::: xanax.enums.Sort
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.enums.Sort
+   :members:
+```
 
-::: xanax.enums.Order
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.enums.Order
+   :members:
+```
 
-::: xanax.enums.TopRange
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.enums.TopRange
+   :members:
+```
 
-::: xanax.enums.Color
-
-::: xanax.enums.FileType
+```{eval-rst}
+.. autoclass:: xanax.sources.wallhaven.enums.Color
+   :members:
+```
 
 ---
 
 ## Unsplash enumerations
 
-::: xanax.sources.unsplash.enums.UnsplashOrientation
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.enums.UnsplashOrientation
+   :members:
+```
 
-::: xanax.sources.unsplash.enums.UnsplashColor
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.enums.UnsplashColor
+   :members:
+```
 
-::: xanax.sources.unsplash.enums.UnsplashOrderBy
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.enums.UnsplashOrderBy
+   :members:
+```
 
-::: xanax.sources.unsplash.enums.UnsplashContentFilter
+```{eval-rst}
+.. autoclass:: xanax.sources.unsplash.enums.UnsplashContentFilter
+   :members:
+```
+
+---
+
+## Reddit enumerations
+
+```{eval-rst}
+.. autoclass:: xanax.sources.reddit.enums.RedditSort
+   :members:
+```
+
+```{eval-rst}
+.. autoclass:: xanax.sources.reddit.enums.RedditTimeFilter
+   :members:
+```

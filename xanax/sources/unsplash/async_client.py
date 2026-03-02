@@ -18,12 +18,12 @@ from typing import Any
 
 import httpx
 
+from xanax._internal.rate_limit import RateLimitHandler
 from xanax.errors import (
     APIError,
     AuthenticationError,
     NotFoundError,
 )
-from xanax.rate_limit import RateLimitHandler
 from xanax.sources.unsplash.models import UnsplashPhoto, UnsplashSearchResult
 from xanax.sources.unsplash.params import UnsplashRandomParams, UnsplashSearchParams
 
@@ -43,7 +43,7 @@ class AsyncUnsplash:
         async with AsyncUnsplash(access_key="your-access-key") as unsplash:
             result = await unsplash.search(UnsplashSearchParams(query="mountains"))
 
-            async for photo in unsplash.aiter_wallpapers(UnsplashSearchParams(query="forest")):
+            async for photo in unsplash.aiter_media(UnsplashSearchParams(query="forest")):
                 data = await unsplash.download(photo)
 
     Args:
@@ -247,7 +247,7 @@ class AsyncUnsplash:
                 break
             current_params = current_params.with_page(current_params.page + 1)
 
-    async def aiter_wallpapers(self, params: UnsplashSearchParams) -> AsyncIterator[UnsplashPhoto]:
+    async def aiter_media(self, params: UnsplashSearchParams) -> AsyncIterator[UnsplashPhoto]:
         """
         Async-iterate over every photo across all pages of search results.
 
@@ -261,7 +261,7 @@ class AsyncUnsplash:
             :class:`~xanax.sources.unsplash.models.UnsplashPhoto` objects across all pages.
 
         Example:
-            async for photo in unsplash.aiter_wallpapers(UnsplashSearchParams(query="forest")):
+            async for photo in unsplash.aiter_media(UnsplashSearchParams(query="forest")):
                 data = await unsplash.download(photo)
         """
         async for page in self.aiter_pages(params):

@@ -11,9 +11,9 @@ You can get your API key from [Wallhaven account settings](https://wallhaven.cc/
 ## Passing a key directly
 
 ```python
-from xanax import Xanax
+from xanax import Wallhaven
 
-client = Xanax(api_key="your-api-key")
+client = Wallhaven(api_key="your-api-key")
 print(client.is_authenticated)  # True
 ```
 
@@ -26,19 +26,19 @@ export WALLHAVEN_API_KEY=your-api-key
 ```
 
 ```python
-client = Xanax()  # automatically picks up WALLHAVEN_API_KEY
+client = Wallhaven()  # automatically picks up WALLHAVEN_API_KEY
 print(client.is_authenticated)  # True
 ```
 
-This works for both `Xanax` and `AsyncXanax`. The explicit `api_key` argument always takes precedence over the environment variable.
+This works for both `Wallhaven` and `AsyncWallhaven`. The explicit `api_key` argument always takes precedence over the environment variable.
 
 ## Key security
 
 The API key is transmitted via the `X-API-Key` HTTP header on every authenticated request. It is never included in query parameters, never logged, and never exposed in `repr()` or `str()` output.
 
 ```python
-client = Xanax(api_key="my-secret-key")
-print(client)  # Xanax(authenticated)  — key not visible
+client = Wallhaven(api_key="my-secret-key")
+print(client)  # Wallhaven(authenticated)  — key not visible
 ```
 
 ## Checking authentication status
@@ -53,10 +53,10 @@ if client.is_authenticated:
 Calling NSFW-protected endpoints without a key raises `AuthenticationError` before any network request is made:
 
 ```python
-from xanax import Xanax, SearchParams, Purity
+from xanax import Wallhaven, SearchParams, Purity
 from xanax.errors import AuthenticationError
 
-client = Xanax()  # no key
+client = Wallhaven()  # no key
 
 try:
     client.search(SearchParams(purity=[Purity.NSFW]))

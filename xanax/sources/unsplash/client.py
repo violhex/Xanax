@@ -3,7 +3,7 @@ Synchronous Unsplash client.
 
 Provides a clean, type-safe interface to the Unsplash API v1.
 All responses are parsed into typed models and the download contract
-matches the :class:`~xanax.sources._base.WallpaperSource` protocol.
+matches the :class:`~xanax.sources._base.MediaSource` protocol.
 
 Unsplash requires attribution. The :meth:`~Unsplash.download` method
 automatically triggers the required tracking endpoint before fetching
@@ -17,12 +17,12 @@ from typing import Any
 
 import httpx
 
+from xanax._internal.rate_limit import RateLimitHandler
 from xanax.errors import (
     APIError,
     AuthenticationError,
     NotFoundError,
 )
-from xanax.rate_limit import RateLimitHandler
 from xanax.sources.unsplash.models import UnsplashPhoto, UnsplashSearchResult
 from xanax.sources.unsplash.params import UnsplashRandomParams, UnsplashSearchParams
 
@@ -35,8 +35,8 @@ class Unsplash:
     The key can be passed directly or read from the ``UNSPLASH_ACCESS_KEY``
     environment variable.
 
-    Satisfies :class:`~xanax.sources._base.WallpaperSource`: ``download``
-    and ``iter_wallpapers`` work identically to the Wallhaven client, making
+    Satisfies :class:`~xanax.sources._base.MediaSource`: ``download``
+    and ``iter_media`` work identically to the Wallhaven client, making
     it straightforward to write source-agnostic code.
 
     Example:
@@ -245,7 +245,7 @@ class Unsplash:
                 break
             current_params = current_params.with_page(current_params.page + 1)
 
-    def iter_wallpapers(self, params: UnsplashSearchParams) -> Iterator[UnsplashPhoto]:
+    def iter_media(self, params: UnsplashSearchParams) -> Iterator[UnsplashPhoto]:
         """
         Iterate over every photo across all pages of search results.
 
@@ -259,7 +259,7 @@ class Unsplash:
             :class:`~xanax.sources.unsplash.models.UnsplashPhoto` objects across all pages.
 
         Example:
-            for photo in unsplash.iter_wallpapers(UnsplashSearchParams(query="forest")):
+            for photo in unsplash.iter_media(UnsplashSearchParams(query="forest")):
                 data = unsplash.download(photo)
         """
         for page in self.iter_pages(params):

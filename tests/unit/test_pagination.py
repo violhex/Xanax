@@ -2,9 +2,8 @@
 Tests for xanax pagination helpers.
 """
 
-
-from xanax.models import PaginationMeta
 from xanax.pagination import PaginationHelper
+from xanax.sources.wallhaven.models import PaginationMeta
 
 
 class TestPaginationHelper:

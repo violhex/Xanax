@@ -1,13 +1,13 @@
 """
-Tests for xanax models.
+Tests for Wallhaven models.
 """
 
-
-from xanax.enums import Category, Purity
-from xanax.models import (
+from xanax.sources.wallhaven.enums import Category, Purity
+from xanax.sources.wallhaven.models import (
     Avatar,
     Collection,
     PaginationMeta,
+    QueryInfo,
     Tag,
     Thumbnails,
     Uploader,
@@ -163,8 +163,6 @@ class TestPaginationMeta:
         assert meta.seed == "abc123"
 
     def test_pagination_with_tag_query(self):
-        from xanax.models import QueryInfo
-
         data = {
             "current_page": 1,
             "last_page": 10,
