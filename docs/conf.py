@@ -1,6 +1,7 @@
 # Configuration file for the Sphinx documentation builder.
 
 import sys
+from importlib.metadata import version as _version
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -10,8 +11,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 project = "xanax"
 copyright = "2024, xanax contributors"
 author = "xanax"
-release = "0.3.1"
-version = "0.3.1"
+release = _version("xanax")
+version = ".".join(release.split(".")[:2])  # major.minor
 
 # -- General configuration -----------------------------------------------------
 

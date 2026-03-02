@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/xanax)](https://pypi.org/project/xanax/)
 [![Stars](https://img.shields.io/github/stars/violhex/xanax?style=flat)](https://github.com/violhex/xanax/stargazers)
-[![Docs](https://readthedocs.org/projects/xanax/badge/?version=latest)](https://xanax.readthedocs.io)
+[![Docs](https://readthedocs.org/projects/xanax/badge/?version=stable)](https://xanax.readthedocs.io/en/stable/)
 
 A clean, type-safe Python client for multi-source media APIs — Wallhaven, Unsplash, and Reddit.
 
